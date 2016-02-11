@@ -227,11 +227,25 @@ int main(int argc, char** argv)
         }
         capture();
         process();
-		uint32_t n[3];
-		memcpy(n, &(*ip::circle_v_o)[0], 3*sizeof(float));
-		if(ip::circle_v_o != NULL)cout << (float)((*ip::circle_v_o)[0])<< " "<< (float)((*ip::circle_v_o)[1]) << endl;
-		myComm.sendToNav(n, 3);
 		
+		
+		
+		if(ip::circle_v_o != NULL){
+			// cout << (float)((*ip::circle_v_o)[0])<< " "<< (float)((*ip::circle_v_o)[1]) << endl;
+
+			float n[3];
+			memcpy(n, &(*ip::circle_v_o)[0], 3*sizeof(float)); // Copying to n
+			n[0] = n[0] / rawMat.cols;
+			n[1] = n[1] / rawMat.rows;
+			n[2] = n[2] / 40;
+
+			uint32_t j[3];
+			for(int i=0;i<3;i++)j[i]=*((uint32_t*)&n[i]); // Converting to uint32_t
+			cout << n[0] << endl;
+			myComm.sendToNav(j, 3);
+		}
+		
+
         display();
     }
 	
