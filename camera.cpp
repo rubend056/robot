@@ -2,8 +2,4 @@
 
 using namespace cv;
 
-Mat getFrame(){
-	
-	
-	
-}
+

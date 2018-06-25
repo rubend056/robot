@@ -26,7 +26,7 @@ configure_file (
 #     COPYONLY
 # )
 
-This will copy the file replacing it
+#This will copy the file replacing it
 file(
     COPY
     ${PROJECT_SOURCE_DIR}/logo.png
@@ -65,8 +65,9 @@ set(LIBS
 add_executable(
     ${PROJECT_NAME}
     
+	#camera.cpp
     main.cpp
-	camera.cpp
+	
 )
 
 target_link_libraries(${PROJECT_NAME} ${LIBS})
