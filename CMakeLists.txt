@@ -14,27 +14,27 @@ configure_file (
   "${PROJECT_BINARY_DIR}/cmakeconfig.h"
 )
 
-# This is to copy a file to the bin dir, will not be replaced if already there
-configure_file(
-   "${PROJECT_SOURCE_DIR}/logo.png"
-   "${PROJECT_BINARY_DIR}/logo.png"
-   COPYONLY
-)
+# # This is to copy a file to the bin dir, will not be replaced if already there
+# configure_file(
+#    "${PROJECT_SOURCE_DIR}/logo.png"
+#    "${PROJECT_BINARY_DIR}/logo.png"
+#    COPYONLY
+# )
 # configure_file(
 #     "${PROJECT_SOURCE_DIR}/assets/default.ply"
 #     "${PROJECT_BINARY_DIR}/assets/default.ply"
 #     COPYONLY
 # )
 
-# This will copy the file replacing it
-# file(COPY
-    # ${PROJECT_SOURCE_DIR}/open-sans
-    # ${PROJECT_SOURCE_DIR}/assets
-    # ${PROJECT_SOURCE_DIR}/default.ply
-    # ${PROJECT_SOURCE_DIR}/default.fbx
-    # DESTINATION
-    # ${PROJECT_BINARY_DIR}
-# )
+This will copy the file replacing it
+file(
+    COPY
+    ${PROJECT_SOURCE_DIR}/logo.png
+    ${PROJECT_SOURCE_DIR}/test1.png
+    ${PROJECT_SOURCE_DIR}/test2.png
+    DESTINATION
+    ${PROJECT_BINARY_DIR}
+)
 
 
 # find_package(OpenGL REQUIRED)
@@ -66,6 +66,7 @@ add_executable(
     ${PROJECT_NAME}
     
     main.cpp
+	camera.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} ${LIBS})
