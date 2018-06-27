@@ -29,9 +29,9 @@ configure_file (
 #This will copy the file replacing it
 file(
     COPY
-    ${PROJECT_SOURCE_DIR}/logo.png
-    ${PROJECT_SOURCE_DIR}/test1.png
-    ${PROJECT_SOURCE_DIR}/test2.png
+    ${PROJECT_SOURCE_DIR}/test_images/logo.png
+    ${PROJECT_SOURCE_DIR}/test_images/test1.png
+    ${PROJECT_SOURCE_DIR}/test_images/test2.png
     DESTINATION
     ${PROJECT_BINARY_DIR}
 )
@@ -44,8 +44,9 @@ include_directories(
     ${PROJECT_BINARY_DIR}
     ${PROJECT_SOURCE_DIR}
 
-    
+    libs
 )
+
 
 # link_directories(
 #     libs/core/allegro5/lib
@@ -64,9 +65,12 @@ set(LIBS
 
 add_executable(
     ${PROJECT_NAME}
+	
+	main.cpp
+	comands.cpp
+	logic_process.cpp
+    img_process.cpp
     
-	#camera.cpp
-    main.cpp
 	
 )
 
