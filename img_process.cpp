@@ -1,4 +1,4 @@
-#include <img_process.h>
+#include "img_process.h"
 
 using namespace ip;
 using namespace cv;
@@ -14,7 +14,7 @@ struct Color{
 };
 
 //Define all the colors
-vector<Color> colors = {/*BLUE*/ Color(239, 21), /*GREEN*/ Color(121, 10), /*RED*/ Color(0, 10), /*YELLOW*/ Color(59, 10)};
+vector<Color> colors = {/*BLUE 178-260*/ Color(219, 41), /*GREEN 90-150*/ Color(120, 30), /*RED 0-20 340-360*/ Color(0, 20), /*YELLOW 30-90*/ Color(60, 30)};
 
 Mat extractColor (Mat hsvMat, Color col){
 	Mat mask; 
@@ -32,7 +32,7 @@ Mat extractColor (Mat hsvMat, Color col){
 			ulrange = lrange;
 		}
 		
-		Scalar llower (llrange,50,90);
+		Scalar llower (llrange,50,100);
 		Scalar lupper (lurange,255,255);
 		
 		Scalar ulower (ulrange,50,90);
@@ -62,7 +62,7 @@ vector<Object> ip::process(){
 	}
 	
 	Mat masked;
-	rgb.copyTo(masked, colorMasks[3]);
+	rgb.copyTo(masked, colorMasks[0] | colorMasks[1] | colorMasks[2] | colorMasks[3]);
 	setFinal(masked);
 	
 	

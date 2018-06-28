@@ -5,8 +5,8 @@
 #ifndef IMG_PROCESS
 #define IMG_PROCESS
 
-#include <main.h>
-#include <logic_process.h>
+#include "main.h"
+#include "logic_process.h"
 #include <vector>
 
 using namespace cv;

@@ -1,8 +1,8 @@
 #ifndef LOGIC_PROCESS
 #define LOGIC_PROCESS
 
-#include <main.h>
-#include <comands.h>
+#include "main.h"
+#include "comands.h"
 
 namespace lp{
 	

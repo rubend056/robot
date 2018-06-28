@@ -1,6 +1,6 @@
-#include <main.h>
-#include <img_process.h>
-#include <logic_process.h>
+#include "main.h"
+#include "img_process.h"
+#include "logic_process.h"
 #include <iostream>
 
 using namespace cv;
