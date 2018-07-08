@@ -1,4 +1,5 @@
 #include "img_process.h"
+#include "nnetwork.h"
 
 using namespace ip;
 using namespace cv;
@@ -51,7 +52,7 @@ Mat extractColor (Mat hsvMat, Color col){
 	return mask;
 }
 
-vector<Object> ip::process(){
+vector<Object> ip::process(){ //Use the trained NN to clashify objects
 	Mat hsv = getHSV();
 	Mat rgb = getRGB();
 	//All the calculations done here
@@ -62,7 +63,7 @@ vector<Object> ip::process(){
 	}
 	
 	Mat masked;
-	rgb.copyTo(masked, colorMasks[0] | colorMasks[1] | colorMasks[2] | colorMasks[3]);
+	rgb.copyTo(masked, colorMasks[2]);
 	setFinal(masked);
 	
 	

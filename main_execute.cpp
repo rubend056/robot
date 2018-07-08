@@ -1,3 +1,5 @@
+//UNFINISHED FILE WORRING ABOUT TRAINING NOW
+
 #include "main.h"
 #include "img_process.h"
 #include "logic_process.h"
@@ -6,13 +8,15 @@
 using namespace cv;
 
 
-
-static Mat rawMat, hsvMat, finalMat;
 static VideoCapture cap;
+static Mat rawMat, hsvMat, finalMat;
 
+Mat getRGB(){return rawMat;}
+Mat getHSV(){return hsvMat;}
+void setFinal(Mat mat){finalMat = mat;}
 
 void startCap(){
-	cap = VideoCapture(0);
+	cap = VideoCapture(1);
 	
 	// Check if camera opened successfully
 	if(!cap.isOpened()){
@@ -21,12 +25,9 @@ void startCap(){
 }
 
 void capture(){
-	#ifdef USE_VIDEO
-		if(cap.isOpened()){cap >> rawMat;}
-	#else
-		Mat rawMatRaw = imread("test1.png", 1);
-		resize(rawMatRaw, rawMat, Size(711, 400));
-	#endif
+	if(cap.isOpened()){cap >> rawMat;}
+
+	
 	
 	cvtColor(rawMat, hsvMat, COLOR_BGR2HSV); //Extract the HSV color space from image
 }
@@ -43,6 +44,8 @@ void display(){
 Mat getRGB(){return rawMat;}
 Mat getHSV(){return hsvMat;}
 void setFinal(Mat mat){finalMat = mat;}
+
+
 
 int main(int argc, char** argv)
 {
@@ -66,5 +69,7 @@ int main(int argc, char** argv)
 	
 	return 0;
 }
+
+
 
 

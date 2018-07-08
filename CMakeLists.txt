@@ -31,7 +31,8 @@ file(
     COPY
     ${PROJECT_SOURCE_DIR}/test_images/logo.png
     ${PROJECT_SOURCE_DIR}/test_images/test1.png
-    ${PROJECT_SOURCE_DIR}/test_images/test2.png
+	${PROJECT_SOURCE_DIR}/test_images/test2.png
+	${PROJECT_SOURCE_DIR}/test_images/test3.jpg
     DESTINATION
     ${PROJECT_BINARY_DIR}
 )
@@ -39,11 +40,14 @@ file(
 
 # find_package(OpenGL REQUIRED)
 find_package(OpenCV REQUIRED)
+find_package(Boost REQUIRED)
 
 include_directories(
     ${PROJECT_BINARY_DIR}
     ${PROJECT_SOURCE_DIR}
-
+	
+	# ${Boost_INCLUDE_DIRS}
+	
     libs
 )
 
@@ -60,18 +64,32 @@ include_directories(
 set(LIBS
     # ${OPENGL_LIBRARY}
     
-    ${OpenCV_LIBS}
+	${OpenCV_LIBS}
+	${Boost_LIBS}
 )
 
 add_executable(
-    ${PROJECT_NAME}
+    "${PROJECT_NAME}_train"
 	
-	main.cpp
+	main_common.cpp
+	main_train.cpp
 	comands.cpp
 	logic_process.cpp
     img_process.cpp
-    
-	
+	nnetwork.cpp
 )
+# add_executable(
+#     "${PROJECT_NAME}_execute"
+	
+# 	main_execute.cpp
+# 	main_common.cpp
+# 	comands.cpp
+# 	logic_process.cpp
+#     img_process.cpp
+# 	nnetwork.cpp
+# )
 
-target_link_libraries(${PROJECT_NAME} ${LIBS})
+
+target_link_libraries("${PROJECT_NAME}_train" ${LIBS})
+# target_link_libraries("${PROJECT_NAME}_execute" ${LIBS})
+
