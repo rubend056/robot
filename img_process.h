@@ -13,11 +13,13 @@ using namespace cv;
 
 namespace ip{
 	
+	Mat getTrainMat(Mat mat);
+	
 	//Uses main.h function of getRGB and getHSV to get image and process it, dividing it into objects
 	vector<Object> process();
 	
 	//To make an overlay into the given Mat that shows all objects, their identified color and type
-	Mat outputProcessed(Mat mat, vector<Object> objects);
+	Mat outputProcessed(Mat mat, Object object);
 	
 }
 

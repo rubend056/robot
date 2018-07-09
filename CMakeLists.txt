@@ -6,7 +6,7 @@ set (CMAKE_CXX_STANDARD 11)
 
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
-set (DEBUG 1)
+set (DEBUG 0)
 
 # This will pass arguments from cmake to the code
 configure_file (
@@ -40,13 +40,12 @@ file(
 
 # find_package(OpenGL REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(Boost REQUIRED)
+find_package(Boost COMPONENTS filesystem REQUIRED) # I spent 5 hours straight figuring out that I had to add "COMPONENTS filesystem" for the thing to work, I'm taking a break now
+find_package(Fann REQUIRED)
 
 include_directories(
     ${PROJECT_BINARY_DIR}
     ${PROJECT_SOURCE_DIR}
-	
-	# ${Boost_INCLUDE_DIRS}
 	
     libs
 )
@@ -65,18 +64,21 @@ set(LIBS
     # ${OPENGL_LIBRARY}
     
 	${OpenCV_LIBS}
-	${Boost_LIBS}
+	${Boost_LIBRARIES}
+    
+    /lib/libfann.so
+	/lib/libfloatfann.so
 )
 
 add_executable(
     "${PROJECT_NAME}_train"
-	
 	main_common.cpp
 	main_train.cpp
 	comands.cpp
 	logic_process.cpp
     img_process.cpp
 	nnetwork.cpp
+    misc.cpp
 )
 # add_executable(
 #     "${PROJECT_NAME}_execute"
@@ -85,7 +87,7 @@ add_executable(
 # 	main_common.cpp
 # 	comands.cpp
 # 	logic_process.cpp
-#     img_process.cpp
+#   img_process.cpp
 # 	nnetwork.cpp
 # )
 
