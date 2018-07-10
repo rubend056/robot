@@ -41,7 +41,7 @@ file(
 # find_package(OpenGL REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Boost COMPONENTS filesystem REQUIRED) # I spent 5 hours straight figuring out that I had to add "COMPONENTS filesystem" for the thing to work, I'm taking a break now
-find_package(Fann REQUIRED)
+#find_package(Fann REQUIRED)
 
 include_directories(
     ${PROJECT_BINARY_DIR}
@@ -60,14 +60,17 @@ include_directories(
 # add_subdirectory(ownlibs)
 # add_subdirectory(scripts)
 
+#SET(GCC_COVERAGE_LINK_FLAGS "-libfann")
+#SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
+
 set(LIBS
     # ${OPENGL_LIBRARY}
     
 	${OpenCV_LIBS}
 	${Boost_LIBRARIES}
-    
-    /lib/libfann.so
-	/lib/libfloatfann.so
+	
+	/usr/local/lib/libfann.so
+	/usr/local/lib/libfloatfann.so
 )
 
 add_executable(

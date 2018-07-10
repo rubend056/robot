@@ -1,8 +1,8 @@
 #include "misc.h"
 
 fs::path concatPath(fs::path path, string str){
-	path.append (("/" + str).c_str());
-	return path;
+	fs::path p((path.string() + "/" + str).c_str());
+	return p;
 }
 fs::path concatPath(fs::path path, char * str){
 	return concatPath(path, string(str));

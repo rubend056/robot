@@ -6,7 +6,7 @@
 const unsigned int num_input = resx * resy;
 const unsigned int num_output = 4;
 const unsigned int num_layers = 4;
-const float desired_error = (const float) 0.01;
+const float desired_error = (const float) 0.0001;
 const unsigned int max_epochs = 50000;
 const unsigned int epochs_between_reports = 500;
 
@@ -21,15 +21,13 @@ class TrainData{
 			height
 			*/
 		TrainData(Mat mat, Object obj, int img_width, int img_height){
-			vector<uchar> array;array.reserve(num_input);
+			
 			#if DEBUG
 			cout << "Image width: " << img_width << endl;
 			cout << "Posx: " << obj.x << endl;
 			#endif
-			array.assign(mat.datastart, mat.dataend);
-			for(auto it = array.begin(); it != array.end(); ++it){
-				input.push_back (((float)(*it)) / 255);
-			}
+			
+			input = getInputs(mat);
 			
 			output[0] = (float)obj.x / img_width;
 			output[1] = (float)obj.y / img_height;
@@ -41,6 +39,15 @@ class TrainData{
 			cout << "Output array is " << num_output << " long" << endl;
 			#endif
 		};
+		vector<float> getInputs(Mat mat){
+			vector<float> out;
+			vector<uchar> array;array.reserve(num_input);
+			array.assign(mat.datastart, mat.dataend);
+			for(auto it = array.begin(); it != array.end(); ++it){
+				out.push_back (((float)(*it)) / 255);
+			}
+			return out;
+		}
 		
 };
 
@@ -135,17 +142,20 @@ void saveTrainData(fs::path savePath){
 
 void train(fs::path dataPath, fs::path nn_output){
 	struct fann *ann = fann_create_standard(num_layers, num_input, 40, 10, num_output);
-	cout << "NUM output" << num_output << endl;
-	cout << "NUM output" << ann->num_output << endl;
+	//cout << "NUM output" << num_output << endl;
+	//cout << "NUM output" << ann->num_output << endl;
 	
 	fann_set_activation_function_hidden(ann, fann_activationfunc_enum::FANN_SIGMOID_SYMMETRIC);
 	fann_set_activation_function_output(ann, FANN_SIGMOID_SYMMETRIC);
 	
-	cout << "Fann training from file " << dataPath << endl;
+	//cout << "Fann training from file " << dataPath << endl;
 	fann_train_on_file(ann, dataPath.c_str(), max_epochs, epochs_between_reports, desired_error);
 	
-	cout << "Saving fann to file " << nn_output << endl;
+	//cout << "Saving fann to file " << nn_output << endl;
 	fann_save(ann, nn_output.c_str());
 
 	fann_destroy(ann);
+}
+void execute(Mat){
+	
 }

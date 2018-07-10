@@ -22,10 +22,10 @@ void setFinal(Mat mat){finalMat = mat;}
 
 void usage(const char* comm){
 	cout << "Usage: " << comm << "  <command>" << endl;
-	cout << "	train   <data_filename> <trained_filename> 		data file must be in the root of the nerual_networks directory" << endl;
+	cout << "	train   <data_filename> <trained_filename>" << endl;
 	cout << "	import   <raw_folder_path>" << endl;
-	cout << "	create_data   <data_filaname>				data will be compiled from cache and saved in the nerual_networks" << endl;
-	cout << "	clear_cache						this will clear the cache" << endl;
+	cout << "	create_data   <data_filaname>" << endl;
+	cout << "	clear_cache" << endl;
 }
 
 int main(int argc, char** argv)
@@ -47,6 +47,9 @@ int main(int argc, char** argv)
 		if(argc < 4){usage(argv[0]);return 1;} // Check if we at least have 3 commands
 		auto data_filename = concatPath(nnPath, argv[2]);
 		auto output_filename = concatPath(nnPath, argv[3]);
+		
+		cout << "Training network from file " << data_filename << endl;
+		cout << "Output set to " << output_filename << endl;
 		
 		if(!fs::exists(data_filename)){cout << data_filename << " doesn't exist" << endl;return 1;}
 		train(data_filename, output_filename);
