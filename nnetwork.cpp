@@ -87,7 +87,8 @@ void importFile(fs::path cacheDir, fs::path _path, vector<Object> objects){
 	
 	trainMat = ip::getTrainMat(mat);
 	
-	cv::imshow("Importing..", trainMat);
+	//This function will copy the image to a new location
+	cv::imshow("Importing..", writeObjects(mat, objects));
 	// #if DEBUG
 	// waitKey(30);
 	// #else

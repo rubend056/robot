@@ -99,7 +99,8 @@ int main(int argc, char** argv)
 		
 		auto cachePaths = listFolder(cacheDir);
 		for (auto it = cachePaths.begin(); it != cachePaths.end(); ++it){
-			if((*it).extension() == ".jpg"){
+			auto ext = (*it).extension();
+			if(ext == ".jpg" || ext == ".jpeg" || ext == ".png"){
 				readFile(*it);
 			}
 		}

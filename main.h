@@ -39,7 +39,8 @@ class Object{
 
 bool generalFolder(string name);
 
-
+cv::Mat writeObjects(cv::Mat src, vector<Object> objs);
+cv::Mat writeObjects(cv::Mat src, Object objs);
 
 
 cv::Mat getRGB();

@@ -86,13 +86,13 @@ cv::Mat writeObjects(cv::Mat src, vector<Object> objs){
 	
 	for(auto it = objs.begin(); it != objs.end(); ++it){
 		cv::rectangle(out, cv::Rect2i(it->x, it->y, it->w, it->h), cv::Scalar(0), 2);
+		/*
 		cv::rectangle(out, cv::Rect2i(
 									it->x - it->w + textBackW / 2, 
 									it->y - it->h - textBackH / 2, 
 									textBackW, textBackH), 
 									cv::Scalar(0,0,0), CV_FILLED);
-		// cv::putText(out, "") 
-		// Gotta leave something for tomorrow :)
+		*/
 	}
 	
 	return out;
