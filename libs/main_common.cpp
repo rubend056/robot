@@ -4,12 +4,21 @@
 #include <boost/format.hpp>
 #include <sstream>
 
+static volatile sig_atomic_t keepRunning = true;
 void intHandler(int dummy) {
-    keepRunning = 0;
+	keepRunning = false;
+}
+bool checkSig(){
+	return (bool)keepRunning;
 }
 
 bool generalFolder(string name){ // General folders hold no object data in folder name and all files provide their own data
 	return name.find("_") == -1;
+}
+cv::Mat getHSV(cv::Mat mat){
+	cv::Mat hsv;
+	cv::cvtColor(mat, hsv, cv::COLOR_BGR2HSV);
+	return hsv;
 }
 
 string Object::getFileName(){ //We'll implement this later

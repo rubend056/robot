@@ -27,20 +27,20 @@ configure_file (
 # )
 
 #This will copy the file replacing it
-file(
-    COPY
-    ${PROJECT_SOURCE_DIR}/test_images/logo.png
-    ${PROJECT_SOURCE_DIR}/test_images/test1.png
-	${PROJECT_SOURCE_DIR}/test_images/test2.png
-	${PROJECT_SOURCE_DIR}/test_images/test3.jpg
-    DESTINATION
-    ${PROJECT_BINARY_DIR}
-)
+file( GLOB TEST_IMAGES "${CMAKE_CURRENT_SOURCE_DIR}/test_images/*" )
+foreach( file ${TEST_IMAGES} )
+    file(
+        COPY
+        ${file}
+        DESTINATION
+        ${PROJECT_BINARY_DIR}
+    )
+endforeach( file ${TEST_IMAGES} )
 
 
 # find_package(OpenGL REQUIRED)
 find_package(OpenCV REQUIRED)
-find_package(Boost COMPONENTS filesystem REQUIRED) # I spent 5 hours straight figuring out that I had to add "COMPONENTS filesystem" for the thing to work, I'm taking a break now
+find_package(Boost COMPONENTS filesystem REQUIRED) # I spent 5 hours straight figuring out that I had to add "COMPONENTS filesystem" for the thing to work... dude
 #find_package(Fann REQUIRED)
 
 include_directories(
@@ -48,6 +48,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}
 	
     libs
+    standard_libs
 )
 
 
@@ -60,8 +61,12 @@ include_directories(
 # add_subdirectory(ownlibs)
 # add_subdirectory(scripts)
 
-#SET(GCC_COVERAGE_LINK_FLAGS "-libfann")
-#SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
+set(LIB_FOLDER
+    /usr/lib # Change this if you see it doesn't find the fann library
+)
+
+add_subdirectory(libs)
+add_subdirectory(standard_libs)
 
 set(LIBS
     # ${OPENGL_LIBRARY}
@@ -69,32 +74,35 @@ set(LIBS
 	${OpenCV_LIBS}
 	${Boost_LIBRARIES}
 	
-	/usr/local/lib/libfann.so
-	/usr/local/lib/libfloatfann.so
+    ${FANN_LIBS}
+	"${LIB_FOLDER}/libfann.so"
+    "${LIB_FOLDER}/libfloatfann.so"
+    
+    robot
+    common
 )
 
-add_executable(
-    "${PROJECT_NAME}_train"
-	main_common.cpp
-	main_train.cpp
-	comands.cpp
-	logic_process.cpp
-    img_process.cpp
-	nnetwork.cpp
-    misc.cpp
-)
+file( GLOB APP_SOURCES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" )
+foreach( src_file ${APP_SOURCES} )
+    # I used a simple string replace, to cut off .cpp.
+    message(${src_file})
+    string( REPLACE ".cpp" "" nme ${src_file} )
+    string( REPLACE "src/" "" nme ${nme} )
+    add_executable( ${nme} ${src_file} )
+    # Make sure YourLib is linked to each app
+    target_link_libraries( ${nme} ${LIBS})
+endforeach( src_file ${APP_SOURCES} )
+
 # add_executable(
-#     "${PROJECT_NAME}_execute"
-	
-# 	main_execute.cpp
-# 	main_common.cpp
-# 	comands.cpp
-# 	logic_process.cpp
-#   img_process.cpp
-# 	nnetwork.cpp
+#     "${PROJECT_NAME}_train"
+# 	main_train.cpp
 # )
 
+# add_executable(
+#     "${PROJECT_NAME}_execute"
+# 	main_execute.cpp
+# )
 
-target_link_libraries("${PROJECT_NAME}_train" ${LIBS})
+# target_link_libraries("${PROJECT_NAME}_train" ${LIBS})
 # target_link_libraries("${PROJECT_NAME}_execute" ${LIBS})
 

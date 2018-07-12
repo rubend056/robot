@@ -12,15 +12,25 @@
 using namespace cv;
 
 namespace ip{
-	
-	Mat getTrainMat(Mat mat);
+	struct Color{
+		public:
+			int hue;	// From 0-360
+			int range;	// From 0-360
+			Color(int h, int r){
+				hue = h;
+				range = r;
+			}
+	};
+
+	//Define all the colors
+	const vector<Color> colors = {/*BLUE 178-260*/ Color(219, 41), /*GREEN 90-150*/ Color(120, 30), /*RED 0-20 340-360*/ Color(0, 20), /*YELLOW 30-90*/ Color(60, 30)};
 	
 	//Uses main.h function of getRGB and getHSV to get image and process it, dividing it into objects
-	vector<Object> process();
+	Mat processMat(Mat mat, Color col);
 	
-	//To make an overlay into the given Mat that shows all objects, their identified color and type
-	Mat outputProcessed(Mat mat, Object object);
+	Mat extractColor (Mat hsvMat, Color col);
 	
+	Mat getTrainMat(Mat mat);
 }
 
 #endif

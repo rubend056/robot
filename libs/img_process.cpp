@@ -4,29 +4,16 @@
 using namespace ip;
 using namespace cv;
 
-struct Color{
-	public:
-		int hue;	// From 0-360
-		int range;	// From 0-360
-		Color(int h, int r){
-			hue = h;
-			range = r;
-		}
-};
-
-//Define all the colors
-vector<Color> colors = {/*BLUE 178-260*/ Color(219, 41), /*GREEN 90-150*/ Color(120, 30), /*RED 0-20 340-360*/ Color(0, 20), /*YELLOW 30-90*/ Color(60, 30)};
-
 const int lowerS = 60, upperS = 255;
 const int lowerV = 40, upperV = 255;
 
 
-Mat extractColor (Mat hsvMat, Color col){
+Mat ip::extractColor (Mat hsvMat, Color col){
 	Mat mask;
 	if (hsvMat.empty()){cout << "HSV is empty, can't go on" << endl; return mask;}
 	
-	int hue = col.hue / 2;
-	int range = col.range / 2;
+	int hue = col.hue / 2; 		// To make max 180
+	int range = col.range / 2; 	// To make max 180
 	
 	if (hue < range || 180 - hue < range){ // This part basically wraps any value, in case it goes over or lower than 0-180
 		int lrange = hue - range, urange = hue + range;
@@ -58,15 +45,19 @@ Mat extractColor (Mat hsvMat, Color col){
 	return mask;
 }
 
-Mat ip::getTrainMat(Mat mat){
+Mat ip::processMat(Mat mat, Color col){
 	Mat hsv = getHSV(mat);
-	Mat defmask = extractColor(hsv, colors[0]);
+	Mat defmask = extractColor(hsv, col);
 	
 	Mat valueMat;
 	extractChannel(hsv, valueMat, 2);
 	Mat outputMat;
 	valueMat.copyTo(outputMat, defmask);
 	return outputMat;
+}
+
+Mat ip::getTrainMat(Mat mat){
+	return processMat(mat, colors[0]);
 }
 
 // vector<Object> ip::process(){ //Use the trained NN to clashify objects
@@ -90,10 +81,5 @@ Mat ip::getTrainMat(Mat mat){
 // 	return toReturn;
 // }
 
-Mat ip::outputProcessed(Mat mat, Object object){
-	
-	
-	return mat;
-}
 
 
