@@ -46,40 +46,38 @@ find_package(Boost COMPONENTS filesystem REQUIRED) # I spent 5 hours straight fi
 include_directories(
     ${PROJECT_BINARY_DIR}
     ${PROJECT_SOURCE_DIR}
-	
+
+	/libs/fann/include
     libs
     standard_libs
 )
 
 
-# link_directories(
-#     libs/core/allegro5/lib
-#     libs/core/assimp/lib
-#     libs/core/glm/lib
-# )
+link_directories(
+    libs/fann/lib
+)
 
 # add_subdirectory(ownlibs)
 # add_subdirectory(scripts)
 
-set(LIB_FOLDER
-    /usr/lib # Change this if you see it doesn't find the fann library
-)
+#set(LIB_FOLDER
+#    /usr/local/lib # Change this if you see it doesn't find the fann library
+#)
 
 add_subdirectory(libs)
 add_subdirectory(standard_libs)
 
 set(LIBS
-    # ${OPENGL_LIBRARY}
-    
+	#${OPENGL_LIBRARY}
+	
 	${OpenCV_LIBS}
 	${Boost_LIBRARIES}
 	
-    ${FANN_LIBS}
-	"${LIB_FOLDER}/libfann.so"
-    "${LIB_FOLDER}/libfloatfann.so"
-    
-    robot
-    common
+	robot
+	common
+	
+	"libfann.so"
+	"libfloatfann.so"
 )
 
 file( GLOB APP_SOURCES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" )
