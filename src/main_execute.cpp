@@ -28,7 +28,7 @@ void startCap(int camera_numb = 0){
 }
 
 string img_path = "";
-vector<Object> objs;
+// vector<Object> objs;
 void capture(){
 	if(img_path == ""){
 		if(cap.isOpened()){cap >> rawMat;}	
@@ -43,10 +43,10 @@ void capture(){
 void process(fs::path nn_path){
 	if(rawMat.empty())return;
 	auto blueMat = ip::processMat(rawMat, ip::colors[0]);
-	objs.clear();
-	objs.push_back(nn::execute_test_cube_nn(blueMat,rawMat.rows, rawMat.cols, nn_path));
-	finalMat = writeObjects(rawMat, objs);
-	cout << objs[0].getFileName() << endl;
+	// objs.clear();
+	// objs.push_back();
+	finalMat = writeObjects(rawMat, nn::execute_test_cube_nn(blueMat,rawMat.rows, rawMat.cols, nn_path));
+	// cout << objs[0].getFileName() << endl;
 }
 void display(){
 	if(!finalMat.empty())imshow("Final", finalMat);
@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 	setArgs(argc, argv);
 	bool video = false;
 	
-	setArgC(1);
+	c_arg = 1;
 	if(!checkArg())return 1;
 	
 	auto nnPath = concatPath(fs::current_path(), nn_dir_name);
@@ -89,8 +89,8 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	
-	namedWindow("Final", WINDOW_NORMAL);
-	resizeWindow("Final", Size(512,384));
+	// namedWindow("Final", WINDOW_NORMAL);
+	// resizeWindow("Final", Size(512,384));
 	if(video){
 		while(waitKey(30) != 27){ //While ESC not pressed
 			capture();

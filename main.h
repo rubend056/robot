@@ -9,6 +9,7 @@
 #include <signal.h> // To handle ctl-c exit
 void intHandler(int dummy);
 bool checkSig();
+extern bool tCascade;
 
 const string cache_dir_name =			"cache";
 const string train_data_dir_name =		"train_data";
@@ -50,7 +51,7 @@ class Object{
 	private:
 };
 
-static cv::Mat testMat;
+extern cv::Mat testMat; // On the main_common.cpp file
 
 bool generalFolder(string name);
 

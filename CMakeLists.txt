@@ -6,7 +6,7 @@ set (CMAKE_CXX_STANDARD 11)
 
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
-set (DEBUG 0)
+set (DEBUG 1)
 
 # This will pass arguments from cmake to the code
 configure_file (

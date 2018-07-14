@@ -14,15 +14,26 @@ static Mat rawMat, hsvMat, finalMat;
 void usage(const char* comm){
 	cout << "Usage: " << comm << "  <command>" << endl;
 	cout << "	train   <data_filename> <trained_filename>" << endl;
-	cout << "			-me <max_epochs = 1000>" << endl;
-	cout << "			-de <desired_error = 0.001>" << endl;
-	cout << "			-ebr <epochs_between_reports = 50>" << endl;
-	cout << "	import   <raw_folder_path>" << endl;
+	cout << "		-t 		<test_data_filename>" << endl;
+	cout << "		-l 		<trained_filename>" << endl;
+	cout << "		-ti 	<test_image_filename (relative to binary)>" << endl;
+	cout << "		-me 	<max_epochs = " << max_epochs << ">" << endl;
+	cout << "		-de 	<desired_error = " << desired_error << ">" << endl;
+	cout << "		-ebr 	<epochs_between_reports = " << epochs_between_reports << ">" << endl;
+	cout << endl;
+	cout << "		-cascade (if set training will be done with cascade)" << endl;
+	cout << "		-mn 	<max_neurons =  " << max_neurons << "> (for cascade only)" << endl;
+	cout << "		-nbr 	<neurons_between_reports = " << neurons_between_reports << "> (for cascade only)" << endl;
+	cout << endl;
+	
+	cout << "	test   <data_filename> <trained_filename>" << endl;
+	cout << "	import  <raw_folder_path>" << endl;
 	cout << "	create_data   <data_filaname>" << endl;
 	cout << "	clear_cache" << endl;
-	cout << "	edit   <trained_filename>" << endl;
-	cout << "			-lr <learn_rate>" << endl;
-	cout << "			-bfl <bit_fail_limit>" << endl;
+	cout << "	edit    <trained_filename>" << endl;
+	cout << "		-lr 	<learn_rate>" << endl;
+	cout << "		-bfl 	<bit_fail_limit>" << endl;
+	cout << endl;
 }
 
 int main(int argc, char** argv)
@@ -31,10 +42,7 @@ int main(int argc, char** argv)
 	//Set the signal handler for program exit
 	signal(SIGINT, intHandler);
 	
-	// cout << endl;
-	
-	setArgC(1);
-	// cout << getArg() << endl;
+	c_arg = 1;
 	if(!checkArg())return 1; // Check if we at least have 1 command
 	
 	//Create the cache dir if it doesn't exist
@@ -46,23 +54,34 @@ int main(int argc, char** argv)
 	//Use commands given as arguments
 	string command(useArg());
 	if(command == "train"){
-		if(!checkArg(2))return 1;
+		if(!checkArg(1))return 1;
 		
+		fs::path test_filename, load_filename;
 		auto data_filename = concatPath(nnPath, useArg());
-		auto test_filename = concatPath(nnPath, useArg());
 		auto output_filename = concatPath(nnPath, useArg());
 		
 		cout << endl;
 		cout << "Training network from file " << data_filename << endl;
-		cout << "Testing network on file 	" << test_filename << endl;
 		cout << "Output set to 				" << output_filename << endl;
 		
-		while(checkArg(1, false)){
+		bool cascade = false;
+		while(checkArg(0, false)){
 			string c(useArg());
 			if(c == "-me"){
 				unsigned int var = atoi(useArg().c_str());
 				max_epochs = var;
 				cout << "	Max epochs set to " << var << endl;
+			}else if(c == "-mn"){
+				int var = atoi(useArg().c_str());
+				max_neurons = var;
+				cout << "	Max neurons set to " << var << endl;
+			}else if(c == "-nbr"){
+				int var = atoi(useArg().c_str());
+				neurons_between_reports = var;
+				cout << "	Neurons between reports set to " << var << endl;
+			}else if(c == "-cascade"){
+				cascade = true;
+				cout << "	Training with cascade" << endl;
 			}else if(c == "-de"){
 				float var = atof(useArg().c_str());
 				desired_error = var;
@@ -71,20 +90,53 @@ int main(int argc, char** argv)
 				unsigned int var = atoi(useArg().c_str());
 				epochs_between_reports = var;
 				cout << "	Epochs between reports set to " << var << endl;
-			}
+			}else if(c == "-t"){
+				test_filename = concatPath(nnPath, useArg());
+				cout << "	Testing network on file 	" << test_filename << endl;
+			}else if(c == "-ti"){
+				auto test_image_filename = concatPath(fs::current_path(), useArg());
+				cout << "	Loading test image from " << test_image_filename << endl;
+				testMat = imread(test_image_filename.string());
+			}else if(c == "-l"){
+				load_filename = concatPath(nnPath, useArg());
+				cout << "	Loading network from file 	" << load_filename << endl;
+			}else
+				useArg();
 		}
 		
 		if(!fs::exists(data_filename)){cout << data_filename << " doesn't exist" << endl;return 1;}
-		if(!fs::exists(test_filename)){cout << test_filename << " doesn't exist" << endl;return 1;}
-		if(!checkArg(0,false)){//We don't have a cached network
-			nn::train(data_filename, test_filename, output_filename);
+		if(!test_filename.empty() && !fs::exists(test_filename)){cout << test_filename << " doesn't exist" << endl;return 1;}
+		if(!load_filename.empty() && !fs::exists(load_filename)){cout << load_filename << " doesn't exist" << endl;return 1;}
+		if(!load_filename.empty()){//We have a cached network
+			if(cascade)
+				nn::trainCascade(data_filename, output_filename, load_filename);
+			else
+				nn::train(data_filename, test_filename, output_filename, load_filename);
 		}else{
-			auto cached_nn_path = concatPath(nnPath, useArg());
-			cout << "Using network on file " << cached_nn_path << endl;
-			if(!fs::exists(cached_nn_path)){cout << cached_nn_path << " doesn't exist" << endl;return 1;}
-			nn::train(data_filename, test_filename, output_filename, cached_nn_path);
+			if(cascade)
+				nn::trainCascade(data_filename, output_filename);
+			else
+				nn::train(data_filename, test_filename, output_filename);
 		}
+	}else if(command == "test"){
+		if(!checkArg(1))return 1;
 		
+		auto data_filename = concatPath(nnPath, useArg());
+		auto trained_filename = concatPath(nnPath, useArg());
+		
+		cout << "Testing network on file " << data_filename << endl;
+		auto data = fann_read_train_from_file(data_filename.c_str());
+		cout << "Loading neural network at " << trained_filename << endl;
+		auto ann = nn::ann_load(trained_filename);
+		
+		fann_reset_MSE(ann);
+		fann_test_data(ann, data);
+		auto t_error = fann_get_MSE(ann);
+		auto t_b_fail = fann_get_bit_fail(ann);
+		printf("Mean Square Error: %f	BitFail: %d\n", t_error, t_b_fail);
+		
+		fann_destroy_train(data);
+		fann_destroy(ann);
 	}else if(command == "import"){
 		if(!checkArg())return 1; // Check if we at least have 2 commands
 		
@@ -166,6 +218,9 @@ int main(int argc, char** argv)
 		printf ("	Bit Fail Limit: %f\n", fann_get_bit_fail_limit(ann));
 		cout << endl;
 		
+		fann_print_connections(ann);
+		fann_print_parameters(ann);
+		
 		while(checkArg(1, false)){
 			string c(useArg());
 			if(c == "-lr"){
@@ -176,7 +231,8 @@ int main(int argc, char** argv)
 				float fl = atof(useArg().c_str());
 				fann_set_bit_fail_limit(ann, fl);
 				cout << "	Bit fail limit set to " << fl << endl;
-			}
+			}else
+				useArg();
 		}
 		fann_save(ann, nn_path.c_str());
 		fann_destroy(ann);

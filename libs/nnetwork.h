@@ -9,6 +9,8 @@
 extern unsigned int max_epochs;
 extern float desired_error;
 extern unsigned int epochs_between_reports;
+extern unsigned int max_neurons;
+extern unsigned int neurons_between_reports;
 
 namespace nn{
 
@@ -25,7 +27,9 @@ namespace nn{
 
 	void saveTrainData(fs::path cacheDir);
 	void train(fs::path dataPath, fs::path testPath, fs::path nn_output);
+	void trainCascade(fs::path dataPath, fs::path nn_output);
 	void train(fs::path dataPath, fs::path testPath, fs::path nn_output, fs::path nn_file);
+	void trainCascade(fs::path dataPath, fs::path nn_output, fs::path nn_file);
 	// void setVars(unsigned int me = 100, float de = 0.001f, unsigned int ebr = 100);
 }
 
