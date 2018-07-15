@@ -6,7 +6,7 @@ set (CMAKE_CXX_STANDARD 11)
 
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
-set (DEBUG 1)
+set (DEBUG 0)
 
 # This will pass arguments from cmake to the code
 configure_file (
@@ -70,11 +70,11 @@ add_subdirectory(standard_libs)
 set(LIBS
 	#${OPENGL_LIBRARY}
 	
-	${OpenCV_LIBS}
-	${Boost_LIBRARIES}
-	
 	robot
 	common
+    
+    ${OpenCV_LIBS}
+	${Boost_LIBRARIES}
 	
 	"libfann.so"
 	"libfloatfann.so"

@@ -126,13 +126,10 @@ void nn::importFile(fs::path cacheDir, fs::path _path, vector<Object> objects){
 vector<TrainData> train_data;
 
 void nn::readFile(fs::path filePath){
-	// cout << "Reading " << filePath << endl;
 	auto matRaw = cv::imread (filePath.string());
-	// cout << "Resizing" << endl;
-	resize(matRaw, matRaw, Size(resx, resy), 0, 0, CV_INTER_AREA);
-	Mat mat;matRaw.copyTo(mat);
-	cout << matRaw.size() << endl;
-	cout << mat.size() << endl;
+	Mat mat;resize(matRaw, mat, Size(resx, resy), 0, 0, CV_INTER_AREA);
+	// cout << matRaw.size() << endl;
+	// cout << mat.size() << endl;
 	train_data.push_back(TrainData(mat, Object::getObjects(filePath.filename().string())[0], matRaw.cols, matRaw.rows));
 }
 

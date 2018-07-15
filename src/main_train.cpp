@@ -4,6 +4,7 @@
 #include "nnetwork.h"
 #include "arg_helper.h"
 #include <iostream>
+#include <time.h>
 
 #include "fann.h"
 
@@ -29,6 +30,7 @@ void usage(const char* comm){
 	cout << "	test   <data_filename> <trained_filename>" << endl;
 	cout << "	import  <raw_folder_path>" << endl;
 	cout << "	create_data   <data_filaname>" << endl;
+	cout << "		-max 	<max_data_number> (if set, data in cache will be randomly picked)" << endl;
 	cout << "	clear_cache" << endl;
 	cout << "	edit    <trained_filename>" << endl;
 	cout << "		-lr 	<learn_rate>" << endl;
@@ -41,6 +43,8 @@ int main(int argc, char** argv)
 	setArgs(argc, argv);
 	//Set the signal handler for program exit
 	signal(SIGINT, intHandler);
+	
+	srand(time(NULL));
 	
 	c_arg = 1;
 	if(!checkArg())return 1; // Check if we at least have 1 command
@@ -180,15 +184,52 @@ int main(int argc, char** argv)
 	}else if(command == "create_data"){
 		if(!checkArg()){return 1;} // Check if we at least have 2 commands
 		
-		auto dataPath = concatPath(nnPath, argv[2]);
+		auto dataPath = concatPath(nnPath, useArg());
 		
 		cout << "Creating data to file " << dataPath << endl;
 		
+		int max = 0;
+		while(checkArg(0, false)){
+			string c(useArg());
+			if(c == "-max"){
+				int var = atoi(useArg().c_str());
+				max = var;
+				cout << "	Max set to " << var << endl;
+			}else
+				useArg();
+		}
+		
 		auto cachePaths = listFolder(cacheDir);
-		for (auto it = cachePaths.begin(); it != cachePaths.end(); ++it){
-			auto ext = (*it).extension();
-			if(ext == ".jpg" || ext == ".jpeg" || ext == ".png"){
-				nn::readFile(*it);
+		int maxFiles = cachePaths.size();
+		
+		if(max > 0 && max < maxFiles){
+			vector<int> left(cachePaths.size());
+			vector<int> toUse;
+			for(int i = 0; i<left.size(); i++){
+				left[i] = i;
+			}
+			for(int i = 0; i<left.size(); i++){ // Deleting any file that is not an image
+				auto ext = cachePaths[i].extension().string();
+				if(ext != ".jpg" || ext != ".jpeg" || ext != ".png")
+					left.erase(left.begin() + i);
+			}
+			for(int i = 0; i<max; i++){
+				if(left.size() == 0)break;
+				auto rindex = rand() % left.size();
+				toUse.push_back(left[rindex]);
+				left.erase(left.begin() + rindex);
+			}
+			
+			for(auto it = toUse.begin(); it != toUse.end(); ++it){
+				cout << *it << " " << endl;
+				nn::readFile(cachePaths[*it]);
+			}
+		}else{
+			for (auto it = cachePaths.begin(); it != cachePaths.end(); ++it){
+				auto ext = (*it).extension();
+				if(ext == ".jpg" || ext == ".jpeg" || ext == ".png"){
+					nn::readFile(*it);
+				}
 			}
 		}
 		
