@@ -4,8 +4,6 @@
 #include <boost/format.hpp>
 #include <sstream>
 
-cv::Mat testMat;
-
 bool tCascade = false;
 
 static volatile sig_atomic_t keepRunning = true;
