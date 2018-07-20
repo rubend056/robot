@@ -5,7 +5,7 @@ unsigned int max_epochs = 1000;
 float desired_error = 0.0001f;
 unsigned int epochs_between_reports = 50;
 unsigned int max_neurons = 1000;
-unsigned int neurons_between_reports = 50;
+unsigned int neurons_between_reports = 1;
 
 // void nn::setVars(unsigned int me, float de, unsigned int ebr){
 // 	max_epochs = me;
@@ -110,7 +110,7 @@ void nn::importFile(fs::path cacheDir, fs::path _path, vector<Object> objects){
 	// #if DEBUG
 	// waitKey(30);
 	// #else
-	waitKey(10);
+	waitKey(5);
 	// #endif
 	
 	//Saving file to cache
@@ -173,7 +173,7 @@ Object nn::execute(Mat mat, struct fann* ann, int actual_w, int actual_h){
 	Object o;
 	
 	//Resizing image to correct input
-	Mat res;mat.copyTo(res);
+	Mat res(mat);
 	if(mat.size().area() != ann->num_input){
 		if(resx * resy == ann->num_input){
 			resize(mat, res, Size(resx, resy));
@@ -201,12 +201,9 @@ Object nn::execute(Mat mat, struct fann* ann, int actual_w, int actual_h){
 	o.w = calc_out[2] * actual_w;
 	o.h = calc_out[3] * actual_h;
 	
-	
-	
-	printf("Raw: %f  %f  %f  %f\n", calc_out[0], calc_out[1], calc_out[2], calc_out[3]);
+	// printf("Raw: %f  %f  %f  %f\n", calc_out[0], calc_out[1], calc_out[2], calc_out[3]);
 	
 	delete calc_out;
-	// delete input;
 	
 	return o;
 }

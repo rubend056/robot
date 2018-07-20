@@ -19,6 +19,7 @@ void usage(const char* comm){
 	cout << "		-hidden <numb> <> <> <>..." << endl;
 	cout << "		(any of the edit arguments can be used at the end)" << endl;
 	cout << "	train	<input_filename> <data_filename> <output_filename>" << endl;
+	// cout << "		-lowest <true, false>" << endl;
 	cout << "		-ti 	<test_image_filename (relative to binary)>" << endl;
 	cout << "		-de 	<desired_error = " << desired_error << ">" << endl;
 	cout << "		Layer Only" << endl;
@@ -36,7 +37,7 @@ void usage(const char* comm){
 	cout << "	print	<nn_filename>" << endl;
 	cout << "	edit	<nn_filename>" << endl;
 	cout << "		-init <data_filename> (uses Widrow + Nguyen’s algorithm, not to be used with cascade)" << endl;
-	cout << "		-init_rand <min> <max> (not to be used with cascade)" << endl;
+	cout << "		-randomize <min> <max> (not to be used with cascade)" << endl;
 	cout << "		-lr 	<learn_rate>" << endl;
 	cout << "		-bfl 	<bit_fail_limit>" << endl;
 	cout << "		-ta 	<training_algorithm = incremental, batch, rprop or quickprop>" << endl;
@@ -50,6 +51,14 @@ void usage(const char* comm){
 	cout << "		-rdmin 	<rprop_delta_min>" << endl;
 	cout << "		-rdmax 	<rprop_delta_max>" << endl;
 	cout << "		-rdzero <rprop_delta_zero>" << endl;
+	cout << "		Cascade(shortcut)>" << endl;
+	cout << "			-minoe <min_output_epochs>" << endl;
+	cout << "			-maxoe <max_output_epochs>" << endl;
+	cout << "			-mince <min_candidate_epochs>" << endl;
+	cout << "			-maxce <max_candidate_epochs>" << endl;
+	cout << "			-ccf <candidate_change_fraction> (used to stop on stagnation)" << endl;
+	cout << "			-cse <candidate_stagnation_epochs> (how many epochs on stagnation to end)" << endl;
+	cout << "			-cg <candidate_groups>" << endl;
 	
 	cout << endl;
 }
@@ -157,25 +166,74 @@ bool edit(struct fann* ann, string c){
 			fann_randomize_weights(ann, min, max);
 			cout << "	Randomized weights from " << min << " to " << max << endl;
 		}
+	}else if(c == "-minoe"){
+		float fl = atof(useArg().c_str());
+		fann_set_cascade_min_out_epochs(ann, fl);
+		cout << "	Cascade min output epochs set to " << fl << endl;
+	}else if(c == "-maxoe"){
+		float fl = atof(useArg().c_str());
+		fann_set_cascade_max_out_epochs(ann, fl);
+		cout << "	Cascade max output epochs set to " << fl << endl;
+	}else if(c == "-mince"){
+		int fl = atoi(useArg().c_str());
+		fann_set_cascade_min_cand_epochs(ann, fl);
+		cout << "	Cascade min candidate epochs set to " << fl << endl;
+	}else if(c == "-maxce"){
+		int fl = atoi(useArg().c_str());
+		fann_set_cascade_max_cand_epochs(ann, fl);
+		cout << "	Cascade max candidate epochs set to " << fl << endl;
+	}else if(c == "-ccf"){
+		float fl = atof(useArg().c_str());
+		fann_set_cascade_candidate_change_fraction(ann, fl);
+		cout << "	Cascade candidate fraction set to " << fl << endl;
+	}else if(c == "-cse"){
+		int fl = atoi(useArg().c_str());
+		fann_set_cascade_candidate_stagnation_epochs(ann, fl);
+		cout << "	Cascade candidate stagnation epochs set to " << fl << endl;
+	}else if(c == "-cg"){
+		int fl = atoi(useArg().c_str());
+		fann_set_cascade_num_candidate_groups(ann, fl);
+		cout << "	Cascade number of candidate groups set to " << fl << endl;
 	}else
 		return false;
 	return true;
 }
 
+struct fann* lowest_ann = NULL;
+float lowest_mse = 1;
+
+// float last_mse;
+// int mse_fail_count;
+
 cv::Mat testMat;
+
 int FANN_API callback(struct fann *ann, struct fann_train_data *train,
 							unsigned int max_epochs, unsigned int epochs_between_reports,
 							float desired_error, unsigned int epochs)
 {
-	printf("Epochs  %8d.  MSE: %.5f. Desired-MSE: %.5f. BitFail: %.5f\n", epochs, fann_get_MSE(ann), desired_error, fann_get_bit_fail(ann));
+	auto bf = fann_get_bit_fail(ann);
+	auto mse = fann_get_MSE(ann);
+	printf("Epochs  %8d.  MSE: %.5f. BitFail: %5d\n", epochs, mse, bf);
 	
 	if(!testMat.empty()){
 		auto pMat = ip::processMat(testMat, ip::colors[0]);
 		cv::namedWindow("Test", WINDOW_NORMAL);
 		cv::imshow("Test", writeObjects(testMat, nn::execute(pMat, ann, testMat.cols, testMat.rows)));
-		// cv::updateWindow("Test");
-		waitKey(30);
+		waitKey(40);
 	}
+	// if (fann_get_train_stop_function(ann) == fann_stopfunc_enum::FANN_STOPFUNC_MSE){
+	// 	if(last_mse - mse <= 0)mse_fail_count++;else mse_fail_count = 0;
+	// 	if(mse_fail_count > 3)return -1;
+	// 	last_mse = mse;
+	// }
+	if (mse < lowest_mse){
+		if(lowest_ann)fann_destroy(lowest_ann);
+		lowest_ann = fann_copy(ann);
+	}
+	
+	Mat tmat(Size(300, 200), CV_8UC1);
+	cv::imshow("Train", ip::showTraining(tmat, mse));
+	waitKey(30);
 	
 	if(!checkSig())return -1;
 	return 0;
@@ -248,13 +306,18 @@ int main(int argc, char** argv)
 		bool cascade = fann_get_network_type(ann) == fann_nettype_enum::FANN_NETTYPE_SHORTCUT;
 		if(cascade){
 			cout << "Starting cascade training" << endl;
-			fann_train_on_file(ann, data_path.c_str(), max_epochs, epochs_between_reports, desired_error);
+			fann_cascadetrain_on_file(ann, data_path.c_str(), max_neurons, neurons_between_reports, desired_error);
 		}else{
 			cout << "Starting layer training" << endl;
-			fann_cascadetrain_on_file(ann, data_path.c_str(), max_epochs, epochs_between_reports, desired_error);
+			fann_train_on_file(ann, data_path.c_str(), max_epochs, epochs_between_reports, desired_error);
+		}
+		if (lowest_ann){
+			fann_save(lowest_ann, output_path.c_str());
+			fann_destroy(lowest_ann);
+		}else{
+			fann_save(ann, output_path.c_str());
 		}
 		
-		fann_save(ann, output_path.c_str());
 		fann_destroy(ann);
 	}else if(command == "test"){
 		if(!checkArg(1))return 1;
@@ -383,6 +446,8 @@ int main(int argc, char** argv)
 		bool shortcut = false;
 		vector<unsigned int> hidden;
 		hidden.push_back(num_input);
+		
+		string l;
 		while(checkArg(0, false)){
 			string c(useArg());
 			if(c == "-shortcut"){
@@ -395,7 +460,7 @@ int main(int argc, char** argv)
 					hidden.push_back(r);
 				}
 				cout << "	Hidden layers: " << var << endl;
-			}else break;
+			}else {l = c;break;}
 		}
 		hidden.push_back(num_output);
 		
@@ -405,6 +470,7 @@ int main(int argc, char** argv)
 		else
 			ann = fann_create_standard_array(hidden.size(), hidden.data());
 		
+		edit(ann, l);
 		while(checkArg(0, false)){
 			auto c = useArg();
 			edit(ann, c);
@@ -422,8 +488,6 @@ int main(int argc, char** argv)
 		auto nn_path = concatPath(nnPath, useArg());
 		cout << "Loading neural network at " << nn_path << endl;
 		auto ann = nn::ann_load(nn_path);
-		
-		fann_print_parameters(ann);
 		
 		while(checkArg(0, false)){
 			auto c = useArg();

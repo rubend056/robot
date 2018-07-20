@@ -31,6 +31,8 @@ namespace ip{
 	Mat extractColor (Mat hsvMat, Color col);
 	
 	Mat getTrainMat(Mat mat);
+	
+	Mat showTraining(Mat mat, float mse);
 }
 
 #endif

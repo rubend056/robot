@@ -60,6 +60,16 @@ Mat ip::getTrainMat(Mat mat){
 	return processMat(mat, colors[0]);
 }
 
+
+//This function will return a mat to help users visualize the training, a simple graph.
+//This will call drawing functions on opencv
+Mat ip::showTraining(Mat mat, float mse){
+	return mat;
+}
+
+
+
+
 // vector<Object> ip::process(){ //Use the trained NN to clashify objects
 // 	Mat hsv = getHSV();
 // 	Mat rgb = getRGB();
