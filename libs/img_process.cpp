@@ -60,10 +60,44 @@ Mat ip::getTrainMat(Mat mat){
 	return processMat(mat, colors[0]);
 }
 
-
+vector<float> mse_list;
+float mse_highest = 0;
 //This function will return a mat to help users visualize the training, a simple graph.
 //This will call drawing functions on opencv
 Mat ip::showTraining(Mat mat, float mse){
+	if (mse > mse_highest)mse_highest = mse; //Update highest
+	mse_list.push_back(mse); // Add to MSE list
+	
+	auto it = mse_list.begin();
+	int mat_w = mat.cols;
+	int mat_h = mat.rows;
+	float mse_size = 1.f / (mse_list.size()-1);
+	
+	
+	auto p_a = cv::Point2i(0, mat_h - (*it / mse_highest * mat_h));
+	it++;
+	if (mse_list.size() <= 2){
+		Point2i p_b;
+		if (mse_list.size() == 1)
+			p_b = cv::Point2i(mat_w, p_a.y);
+		else{
+			p_b = cv::Point2i(mat_w, mat_h - (*it / mse_highest * mat_h));
+		}
+		cv::line(mat, p_a, p_b, cv::Scalar(255,255,255));
+		return mat;
+	}
+	
+	int count = 1;
+	auto p_b = cv::Point2i(mse_size * count * mat_w, mat_h - (*it / mse_highest * mat_h));
+	cv::line(mat, p_a, p_b, cv::Scalar(255,255,255));
+	it++;
+	for (; it!= mse_list.end(); it++){
+		count ++;
+		p_a = cv::Point2i(p_b);
+		p_b = cv::Point2i(mse_size * count * mat_w, mat_h - (*it / mse_highest * mat_h));
+		cv::line(mat, p_a, p_b, cv::Scalar(255,255,255));
+	}
+	
 	return mat;
 }
 

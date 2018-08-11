@@ -172,6 +172,7 @@ struct fann* nn::ann_load(fs::path nn_path){
 Object nn::execute(Mat mat, struct fann* ann, int actual_w, int actual_h){
 	Object o;
 	
+	// cout << "			Resizing" << endl;
 	//Resizing image to correct input
 	Mat res(mat);
 	if(mat.size().area() != ann->num_input){
@@ -187,14 +188,17 @@ Object nn::execute(Mat mat, struct fann* ann, int actual_w, int actual_h){
 	fann_type *calc_out;
 	fann_type input[ann->num_input];
 	
+	// cout << "			Getting inputs" << endl;
 	//Set input
 	auto inputs = TrainData::getInputs(res);
 	for(int i = 0;i<inputs.size();i++){
 		input[i] = inputs[i];
 	}
 	
+	// cout << "			Running" << endl;
 	calc_out = fann_run(ann, input);
 	
+	// cout << "			Collecting output" << endl;
 	//Collect output
 	o.x = calc_out[0] * actual_w;
 	o.y = calc_out[1] * actual_h;
@@ -203,18 +207,19 @@ Object nn::execute(Mat mat, struct fann* ann, int actual_w, int actual_h){
 	
 	// printf("Raw: %f  %f  %f  %f\n", calc_out[0], calc_out[1], calc_out[2], calc_out[3]);
 	
-	delete calc_out;
+	// delete calc_out;
 	
 	return o;
 }
 
 Object nn::execute_test_cube_nn(Mat mat, int actual_w, int actual_h, fs::path cubeNNPath){
 	auto ann = ann_load(cubeNNPath);
-	Object o;
-	if(ann){
-		o = execute(mat, ann, actual_w, actual_h);
-		fann_destroy(ann);
-	}
+	// Object o;
+	// if(ann){
+	// cout << "		Executing" << endl;
+	auto o = execute(mat, ann, actual_w, actual_h);
+	fann_destroy(ann);
+	// }
 	return o;
 }
 // vector<Object> nn::execute(Mat mat){

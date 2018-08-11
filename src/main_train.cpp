@@ -25,6 +25,8 @@ void usage(const char* comm){
 	cout << "		Layer Only" << endl;
 	cout << "			-me 	<max_epochs = " << max_epochs << ">" << endl;
 	cout << "			-ebr 	<epochs_between_reports = " << epochs_between_reports << ">" << endl;
+	cout << "					careful with low ebr numbers as it will attempt" << endl;
+	cout << "					to save to file lowest mse each report" << endl;
 	cout << "		Cascade(Shortcut) Only" << endl;
 	cout << "			-mn 	<max_neurons =  " << max_neurons << ">" << endl;
 	cout << "			-nbr 	<neurons_between_reports = " << neurons_between_reports << ">" << endl;
@@ -199,8 +201,9 @@ bool edit(struct fann* ann, string c){
 	return true;
 }
 
-struct fann* lowest_ann = NULL;
+bool saved_lowest = false;
 float lowest_mse = 1;
+fs::path output_path;
 
 // float last_mse;
 // int mse_fail_count;
@@ -219,7 +222,7 @@ int FANN_API callback(struct fann *ann, struct fann_train_data *train,
 		auto pMat = ip::processMat(testMat, ip::colors[0]);
 		cv::namedWindow("Test", WINDOW_NORMAL);
 		cv::imshow("Test", writeObjects(testMat, nn::execute(pMat, ann, testMat.cols, testMat.rows)));
-		waitKey(40);
+		waitKey(1);
 	}
 	// if (fann_get_train_stop_function(ann) == fann_stopfunc_enum::FANN_STOPFUNC_MSE){
 	// 	if(last_mse - mse <= 0)mse_fail_count++;else mse_fail_count = 0;
@@ -227,13 +230,14 @@ int FANN_API callback(struct fann *ann, struct fann_train_data *train,
 	// 	last_mse = mse;
 	// }
 	if (mse < lowest_mse){
-		if(lowest_ann)fann_destroy(lowest_ann);
-		lowest_ann = fann_copy(ann);
+		lowest_mse = mse;
+		saved_lowest = true;
+		fann_save(ann, output_path.c_str());
 	}
 	
-	Mat tmat(Size(300, 200), CV_8UC1);
+	Mat tmat(Size(300, 200), CV_8UC1, Scalar(0,0,0));
 	cv::imshow("Train", ip::showTraining(tmat, mse));
-	waitKey(30);
+	waitKey(1);
 	
 	if(!checkSig())return -1;
 	return 0;
@@ -263,7 +267,7 @@ int main(int argc, char** argv)
 		
 		auto input_path = concatPath(nnPath, useArg());
 		auto data_path = concatPath(nnPath, useArg());
-		auto output_path = concatPath(nnPath, useArg());
+		output_path = concatPath(nnPath, useArg());
 		
 		cout << endl;
 		
@@ -311,9 +315,9 @@ int main(int argc, char** argv)
 			cout << "Starting layer training" << endl;
 			fann_train_on_file(ann, data_path.c_str(), max_epochs, epochs_between_reports, desired_error);
 		}
-		if (lowest_ann){
-			fann_save(lowest_ann, output_path.c_str());
-			fann_destroy(lowest_ann);
+		
+		if (saved_lowest){
+			cout << "Saved lowest Ann already" << endl;
 		}else{
 			fann_save(ann, output_path.c_str());
 		}
