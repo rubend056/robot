@@ -32,8 +32,8 @@ class Object{
 		static vector<Object> getObjects(string name);
 		static string getString(vector<Object> objects);
 		
-		int x, y; //Position of the object in the screen
-		int w, h; //The width and height of the object in the screen
+		int x = 0, y = 0; //Position of the object in the screen
+		int w = 0, h = 0; //The width and height of the object in the screen
 		// void shift(float shift){
 		// 	x+=shift;
 		// 	y+=shift;

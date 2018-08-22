@@ -45,7 +45,7 @@ void capture(){
 void process(fs::path nn_path){
 	if(rawMat.empty())return;
 	// cout << "	Processing blue" << endl;
-	auto blueMat = ip::processMat(rawMat, ip::colors[0]);
+	auto blueMat = ip::processMat(rawMat, ip::colors[2]);
 	// objs.clear();
 	// objs.push_back();
 	// cout << "	Writing objects" << endl;
