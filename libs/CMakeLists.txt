@@ -4,5 +4,4 @@ add_library(robot
     logic_process.cpp
     img_process.cpp
     nnetwork.cpp
-    misc.cpp
 )

@@ -1,78 +1,11 @@
 #include "main.h"
 #include "img_process.h"
 #include "arg_helper.h"
+#include "browser.h"
 #include <iostream>
 
 
 using namespace cv;
-
-class Browser{
-	public:
-		Browser(fs::path r_path):root_path(r_path.c_str()){clean();update();}
-		Browser(string r_path):root_path(r_path){clean();update();}
-		
-		bool directory = true;
-		
-		int file_count = 0;
-		std::vector<string> names;
-		std::vector<string> availables;
-		
-		void next(){
-			file_count++;
-			
-		}
-		void back(){
-			
-		}
-		void in(){
-			if (!directory)return;
-			
-		}
-		void out(){
-			if (!directory)return;
-			
-		}
-		fs::path getPath(){
-			return fs::path(get_current_path());
-		}
-	private:
-		void clean(){
-			int tocheck = root_path.length()-1;
-			if (root_path[tocheck] == '/')
-				root_path.erase(tocheck, 1);
-		}
-		string get_current_path(){
-			string out = root_path;
-			for(auto name : names){
-				out += '/' + name;
-			}
-			if (directory && availables.size()>0)out += '/' + availables[file_count];
-			return out;
-		}
-		string get_base_path(){
-			
-		}
-		void update(){
-			auto current_path = get_current_path();
-			directory = fs::is_directory(fs::path(current_path.c_str()));
-			availables.clear();
-			if(directory){
-				auto availables_path = listFolder(fs::path(current_path.c_str()));
-				for(auto path : availables_path){
-					availables.push_back(path.filename().string());
-				}
-			}
-			file_count = 0;
-		}
-		
-		void append(string name){
-			names.push_back(name);
-		}
-		void strip(){
-			names.erase(--names.end());
-		}
-		string root_path;
-};
 
 void usage(const char* comm){
 	cout << "Usage: " << comm << "  <path_to_raw_data_folder>" << endl;
@@ -81,8 +14,8 @@ void usage(const char* comm){
 fs::path current_path;
 bool is_image = false;
 
-const int K_LEFT = 37, K_RIGHT = 39, K_UP = 38, K_DOWN = 40, K_MOD = 16, K_ESC = 27;
-const int K_R = 82;
+const int K_LEFT = 81, K_UP = 82, K_RIGHT = 83, K_DOWN = 84, K_ESC = 27;
+const int K_R = 114;
 
 Mat image;
 Object o;
@@ -137,31 +70,34 @@ int main(int argc, char** argv)
 	auto rawPath = fs::path(useArg());
 	if (!fs::exists(rawPath) || !fs::is_directory(rawPath)){cout << "The path must exist and it must be a directory" << endl; return 1;}
 	
-	auto main_list = listFolder(rawPath);
-	auto main_c_path = main_list.begin();
-	current_path = rawPath;
+	Browser browser(rawPath);
 	
+	current_path = browser.getPath();
 	update_image();
 
 	while(1){
-		switch(waitKey(0)){
+		auto key = waitKey(0);
+		switch(key){
 			case K_ESC:
 				return 0;
 				break;
 			case K_LEFT:
-				
+				browser.out();
 				break;
 			case K_RIGHT:
-				
+				browser.in();
 				break;
 			case K_UP:
-				
+				browser.prev();
 				break;
 			case K_DOWN:
-				
+				browser.next();
 				break;
+			default:
+				cout << "Pressed: " << key << endl;
 
 		}
+		current_path = browser.getPath();
 		update_image();
 	}
 }
