@@ -118,7 +118,7 @@ vector<TrainData> train_data;
 
 void nn::readFile(fs::path filePath){
 	auto matRaw = cv::imread (filePath.string());
-	Mat mat;resize(matRaw, mat, Size(resx, resy), 0, 0, CV_INTER_AREA);
+	Mat mat;resize(matRaw, mat, Size(resx, resy), 0, 0, INTER_AREA);
 	// cout << matRaw.size() << endl;
 	// cout << mat.size() << endl;
 	train_data.push_back(TrainData(mat, Object::getObjects(filePath.filename().string())[0], matRaw.cols, matRaw.rows));
