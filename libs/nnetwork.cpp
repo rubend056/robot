@@ -100,18 +100,14 @@ void nn::importFile(fs::path cacheDir, fs::path _path, vector<Object> objects){
 	getCountFile(cacheDir);
 	
 	auto mat = cv::imread (_path.string());
+	cv::Mat trainMat = ip::getTrainMat(mat); // Process to get train
 	
-	cv::Mat trainMat;
-	
-	trainMat = ip::getTrainMat(mat);
-	
-	//This function will copy the image to a new location
-	cv::imshow("Importing..", writeObjects(mat, objects));
-	// #if DEBUG
-	// waitKey(30);
-	// #else
-	waitKey(5);
-	// #endif
+	// auto preview_mat = mat.clone();
+
+	// writeObjects(preview_mat, objects);
+	// cv::imshow("Importing..", preview_mat);
+
+	// waitKey(2);
 	
 	//Saving file to cache
 	imwrite((cacheDir.string() + "/" + Object::getString(objects) + "-" + to_string(import_count++) + ".jpg").c_str(), trainMat);
@@ -171,8 +167,7 @@ struct fann* nn::ann_load(fs::path nn_path){
 
 Object nn::execute(Mat mat, struct fann* ann, int actual_w, int actual_h){
 	Object o;
-	
-	// cout << "			Resizing" << endl;
+
 	//Resizing image to correct input
 	Mat res(mat);
 	if(mat.size().area() != ann->num_input){
@@ -184,30 +179,22 @@ Object nn::execute(Mat mat, struct fann* ann, int actual_w, int actual_h){
 		}
 	}
 	
-	
 	fann_type *calc_out;
 	fann_type input[ann->num_input];
 	
-	// cout << "			Getting inputs" << endl;
 	//Set input
 	auto inputs = TrainData::getInputs(res);
 	for(int i = 0;i<inputs.size();i++){
 		input[i] = inputs[i];
 	}
-	
-	// cout << "			Running" << endl;
+
 	calc_out = fann_run(ann, input);
 	
-	// cout << "			Collecting output" << endl;
 	//Collect output
 	o.x = calc_out[0] * actual_w;
 	o.y = calc_out[1] * actual_h;
 	o.w = calc_out[2] * actual_w;
 	o.h = calc_out[3] * actual_h;
-	
-	// printf("Raw: %f  %f  %f  %f\n", calc_out[0], calc_out[1], calc_out[2], calc_out[3]);
-	
-	// delete calc_out;
 	
 	return o;
 }

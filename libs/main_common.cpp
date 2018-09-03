@@ -91,26 +91,11 @@ string Object::getString(vector<Object> objects){
 	return r;
 }
 
-cv::Mat writeObjects(cv::Mat src, vector<Object> objs){
-	cv::Mat out;
-	src.copyTo(out);
-	
-	const int textBackW = 100, textBackH = 40;
-	
-	for(auto it = objs.begin(); it != objs.end(); ++it){
-		cv::rectangle(out, cv::Rect2i(it->x, it->y, it->w, it->h), cv::Scalar(0), 2);
-		/*
-		cv::rectangle(out, cv::Rect2i(
-									it->x - it->w + textBackW / 2, 
-									it->y - it->h - textBackH / 2, 
-									textBackW, textBackH), 
-									cv::Scalar(0,0,0), CV_FILLED);
-		*/
-	}
-	
-	return out;
+void writeObjects(cv::Mat src, vector<Object> objs){
+	for(auto it = objs.begin(); it != objs.end(); ++it)
+		cv::rectangle(src, cv::Rect2i(it->x, it->y, it->w, it->h), cv::Scalar(0), 2);
 }
-cv::Mat writeObjects(cv::Mat src, Object obj){
+void writeObjects(cv::Mat src, Object obj){
 	vector<Object> objs = {obj};
-	return writeObjects(src, objs);
+	writeObjects(src, objs);
 }

@@ -221,7 +221,8 @@ int FANN_API callback(struct fann *ann, struct fann_train_data *train,
 	if(!testMat.empty()){
 		auto pMat = ip::processMat(testMat, ip::colors[0]);
 		cv::namedWindow("Test", WINDOW_NORMAL);
-		cv::imshow("Test", writeObjects(testMat, nn::execute(pMat, ann, testMat.cols, testMat.rows)));
+		writeObjects(testMat, nn::execute(pMat, ann, testMat.cols, testMat.rows));
+		cv::imshow("Test", testMat);
 		waitKey(1);
 	}
 	// if (fann_get_train_stop_function(ann) == fann_stopfunc_enum::FANN_STOPFUNC_MSE){

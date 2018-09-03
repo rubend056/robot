@@ -44,13 +44,12 @@ void capture(){
 }
 void process(fs::path nn_path){
 	if(rawMat.empty())return;
-	// cout << "	Processing blue" << endl;
+	
 	auto blueMat = ip::processMat(rawMat, ip::colors[2]);
-	// objs.clear();
-	// objs.push_back();
-	// cout << "	Writing objects" << endl;
-	finalMat = writeObjects(rawMat, nn::execute_test_cube_nn(blueMat,rawMat.rows, rawMat.cols, nn_path));
-	// cout << objs[0].getFileName() << endl;
+	
+	writeObjects(rawMat, nn::execute_test_cube_nn(blueMat,rawMat.rows, rawMat.cols, nn_path));
+	
+	finalMat = rawMat;
 }
 void display(){
 	if(!finalMat.empty())imshow("Final", finalMat);

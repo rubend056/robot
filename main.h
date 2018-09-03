@@ -53,8 +53,8 @@ class Object{
 bool generalFolder(string name);
 
 //To make an overlay into the given Mat that shows all objects, their identified color and type
-cv::Mat writeObjects(cv::Mat src, vector<Object> objs);
-cv::Mat writeObjects(cv::Mat src, Object objs);
+void writeObjects(cv::Mat src, vector<Object> objs);
+void writeObjects(cv::Mat src, Object objs);
 
 
 // cv::Mat getRGB();
