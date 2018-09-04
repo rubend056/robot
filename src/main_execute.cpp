@@ -4,6 +4,7 @@
 #include "nnetwork.h"
 #include "fann.h"
 
+
 #include "arg_helper.h"
 
 #include <iostream>
@@ -11,7 +12,8 @@
 using namespace cv;
 
 VideoCapture cap;
-Mat rawMat, hsvMat, finalMat;
+Mat rawMat, hsvMat, finalMat, capturedMat;
+
 
 void usage(const char* comm){
 	cout << "Usage: " << comm << "  <nn_name> <command>" << endl;
@@ -25,6 +27,7 @@ void startCap(int camera_numb = 0){
 	// Check if camera opened successfully
 	if(!cap.isOpened()){
 		cout << "Error opening video stream" << endl;
+		exit(0);
 	}
 }
 
@@ -56,9 +59,23 @@ void display(){
 	// waitKey(1);
 }
 
+
 Mat getRGB(){return rawMat;}
 Mat getHSV(){return hsvMat;}
 void setFinal(Mat mat){finalMat = mat;}
+
+int in;
+string loc = "../../test_images/Image_Detect";
+string loctype = ".png";
+vector<int> compression_params;
+void capture( Mat frame){
+	loc += in;
+	loc += loctype;
+	//compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);
+	//compression_params.push_back(100);
+	cv::imwrite(loc , frame);
+	in++;
+}
 
 // struct fann* ann_load(fs::path nn_path){
 // 	if(!fs::exists(nn_path) || !fs::is_regular_file(nn_path)){cout << "either nn_path doesn't exist, or it is not a file" << endl;exit(1);}
@@ -66,11 +83,15 @@ void setFinal(Mat mat){finalMat = mat;}
 // 	return ann;
 // }
 
+
+
 int main(int argc, char** argv)
 {
 	setArgs(argc, argv);
 	bool video = false;
 	
+
+
 	c_arg = 1;
 	if(!checkArg())return 1;
 	
@@ -111,11 +132,12 @@ int main(int argc, char** argv)
 			// cout << "Processed" << endl;
 			display();
 			// cout << "Displayed" << endl;
-		}
+			if(waitKey(15) != -1){ capture(finalMat);} 
+			}
 	}else{
 		capture();
 		process(nnPath);
-		display();
+		display(); 
 		
 		waitKey(0);
 	}
