@@ -45,14 +45,14 @@ string Object::getFileName(){ //We'll implement this later
 void Object::useFilename(string name){
 	//Deleting any extension still prevailing in the name
 	auto dotIndex = name.find(".");
-	if(dotIndex != -1){ 
+	if(dotIndex != -1)
 		name.substr(dotIndex, name.length() - dotIndex);
-	}
+	
 	//Deleting any "other" extension still prevailing in the name
 	dotIndex = name.find("-");
-	if(dotIndex != -1){ 
+	if(dotIndex != -1) 
 		name.substr(dotIndex, name.length() - dotIndex);
-	}
+	
 	
 	vector<string> strings;
 	boost::split(strings, name, boost::is_any_of("_"));
