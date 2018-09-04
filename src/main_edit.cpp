@@ -46,8 +46,8 @@ void update_image(){
 	putText(header, count_text, Point(2,height+4), font_face, font_size, font_color, font_width);
 	
 	string path_string = br->getPath().string();
-	auto path_size = getTextSize(, font_face, font_size, font_width, &baseline);
-	putText(header, current_path.string(), Point(header_size.width/2 - path_size.width/2,height), 
+	auto path_size = getTextSize(path_string, font_face, font_size, font_width, &baseline);
+	putText(header, path_string, Point(header_size.width/2 - path_size.width/2,height), 
 		font_face, font_size, font_color, font_width);
 
 	auto obj_string = o.getFileName();
@@ -69,7 +69,7 @@ void update_image(){
 
 void load_image(){
 	if (br->is_valid() && !br->directory){
-		image = imread(br->getPath());
+		image = cv::imread(br->getPath().string());
 	}else image.release();
 }
 
@@ -97,9 +97,9 @@ int main(int argc, char** argv)
 				return 0;
 				break;
 			
-			// Browser inupt
+			// Browser input
 			case K_LEFT:
-				browser.out();
+				browser.out();	
 				load_image();
 				break;
 			case K_RIGHT:

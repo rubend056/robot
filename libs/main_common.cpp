@@ -44,14 +44,14 @@ string Object::getFileName(){ //We'll implement this later
 
 void Object::useFilename(string name){
 	//Deleting any extension still prevailing in the name
-	auto dotIndex = name.find(".");
+	auto dotIndex = name.find_last_of('.');
 	if(dotIndex != -1)
 		name.substr(dotIndex, name.length() - dotIndex);
 	
 	//Deleting any "other" extension still prevailing in the name
-	dotIndex = name.find("-");
-	if(dotIndex != -1) 
-		name.substr(dotIndex, name.length() - dotIndex);
+	// dotIndex = name.find("-");
+	// if(dotIndex != -1) 
+	// 	name.substr(dotIndex, name.length() - dotIndex);
 	
 	
 	vector<string> strings;
@@ -70,13 +70,13 @@ void Object::useFilename(string name){
 
 vector<Object> Object::getObjects(string name){
 	vector<string> objectStrings;
-	// cout << "Splitting " << name << endl;
-	boost::split(objectStrings, name, boost::is_any_of("|"));
-	// cout << "Done splitting " << endl;
+	
+	boost::split(objectStrings, name, boost::is_any_of("+"));
+	
 	vector<Object> objects;
-	for(auto it = objectStrings.begin(); it!=objectStrings.end(); ++it){
+	for(auto it = objectStrings.begin(); it!=objectStrings.end(); ++it)
 		objects.push_back(Object(*it));
-	}
+	
 	return objects;
 }
 
@@ -84,7 +84,7 @@ string Object::getString(vector<Object> objects){
 	string r = "";
 	string l = "";
 	for(auto it = objects.begin(); it != objects.end(); ++it){
-		if(l != "")r+= "|";
+		if(l != "")r+= "+";
 		l = (*it).getFileName();
 		r += l;
 	}

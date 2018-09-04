@@ -12,6 +12,7 @@ class Browser{
 		Browser(string r_path):root_path(r_path){begin();};
 		
 		int file_count = 0;
+		bool directory = true;
 		std::vector<string> availables;
 		
 		bool is_directory();
@@ -26,7 +27,7 @@ class Browser{
 		void begin();
 		string root_path;
 		
-		bool directory = true;
+		
 		
 		
 		
