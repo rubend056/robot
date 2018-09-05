@@ -73,7 +73,8 @@ void capture( Mat frame){
 	loc += loctype;
 	//compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);
 	//compression_params.push_back(100);
-	cv::imwrite(loc , frame);
+	//cv::imwrite(loc , frame);
+	cout << " hi danny " << endl;
 	in++;
 }
 
