@@ -4,6 +4,8 @@
 #include "browser.h"
 #include <iostream>
 
+#include <boost/algorithm/string.hpp>
+#include <boost/format.hpp>
 
 using namespace cv;
 
@@ -11,22 +13,20 @@ void usage(const char* comm){
 	cout << "Usage: " << comm << "  <path_to_raw_data_folder>" << endl;
 }
 
-fs::path current_path;
-bool is_image = false;
-
 const int K_LEFT = 81, K_UP = 82, K_RIGHT = 83, K_DOWN = 84, K_ESC = 27;
 const int K_a = 97, K_s = 115, K_d = 100, K_w = 119;
 const int K_f = 102, K_g = 103, K_h = 104, K_t = 116;
 const int K_shift = 225, K_ctrl = 227;
-const int K_R = 114;
+const int K_r = 114;
 
 Mat image;
 Object o;
 Browser *br;
 
-auto header_size = Size(600,30);
+auto header_size = Size(1000,30);
 
-int it_index, it_max;
+int xy_move_speed = 4;
+// int wh_move_speed = 1;
 
 void update_image(){
 	Mat to_show;
@@ -34,7 +34,7 @@ void update_image(){
 	if (!image.empty())header_size.width = image.cols;
 
 	// Make header and add all info
-	Mat header(header_size, CV_8UC1, Scalar(0,0,0));
+	Mat header(header_size, CV_8UC3, Scalar(0,0,0));
 	auto height = header_size.height/2;
 	Scalar font_color(255,255,255);
 	int baseline = 0;
@@ -50,7 +50,7 @@ void update_image(){
 	putText(header, path_string, Point(header_size.width/2 - path_size.width/2,height), 
 		font_face, font_size, font_color, font_width);
 
-	auto obj_string = o.getFileName();
+	auto obj_string = to_string(xy_move_speed) + "  " +  o.getFileName();
 	auto obj_size = getTextSize(obj_string, font_face, font_size, font_width, &baseline);
 	putText(header, obj_string, Point(header_size.width - obj_size.width,height), 
 		font_face, font_size, font_color, font_width);
@@ -59,7 +59,7 @@ void update_image(){
 	if (!image.empty()){
 		Mat image_show = image.clone();
 		writeObjects(image_show, o);
-		vconcat(header, image, to_show);
+		vconcat(header, image_show, to_show);
 	}else
 		to_show = header;
 
@@ -67,10 +67,52 @@ void update_image(){
 	imshow("Editing", to_show);
 }
 
+bool editing = false;
+fs::path edit_path;
+int image_count = 0;
+
+void reset_object(){
+	o.x = 300;
+	o.y = 300;
+	o.w = 200;
+	o.h = 200;
+}
+
+void save_image(){
+	if (editing){
+		// cout << "Image has cols " << image.cols << endl;
+		fs::remove(edit_path);
+		imwrite(br->getPath_dir().string() + '/' + to_string(image_count) + '-' + o.getFileName() + ".jpg", image);
+		image.release();
+		br->reload();
+		editing = false;
+	}
+}
+
 void load_image(){
+	if (editing)
+		save_image();
+	
 	if (br->is_valid() && !br->directory){
-		image = cv::imread(br->getPath().string());
-	}else image.release();
+		// Read the image
+		edit_path = br->getPath();
+		image = cv::imread(edit_path.string());
+		
+		// Decompose the filename
+		vector<string> segments;
+		boost::split(segments, br->getPath().filename().string(), boost::is_any_of("-"));
+		
+		image_count = getInt(segments[0]);
+		if (segments.size() > 1)
+			o.useFilename(segments[1]);
+		else {
+			reset_object();
+			o.x = image.cols/2 - o.w/2;
+			o.y = image.rows/2 - o.h/2;
+		}
+		
+		editing = true;
+	}else {image.release();editing = false;}
 }
 
 int main(int argc, char** argv)
@@ -84,11 +126,10 @@ int main(int argc, char** argv)
 	Browser browser(rawPath);
 	br = &browser;
 	
-	current_path = browser.getPath();
+	load_image();
 	update_image();
 	
-	int xy_move_speed = 1;
-	int wh_move_speed = 1;
+	
 
 	while(1){
 		auto key = waitKey(0);
@@ -130,16 +171,30 @@ int main(int argc, char** argv)
 				break;
 			
 			case K_f:
-				o.w -= wh_move_speed;
+				o.w -= xy_move_speed;
 				break;
 			case K_h:
-				o.w += wh_move_speed;
+				o.w += xy_move_speed;
 				break;
 			case K_t:
-				o.h += wh_move_speed;
+				o.h -= xy_move_speed;
 				break;
 			case K_g:
-				o.h -= wh_move_speed;
+				o.h += xy_move_speed;
+				break;
+				
+			case K_r:
+				o.x = 0;
+				o.y = 0;
+				o.w = 20;
+				o.h = 20;
+				break;
+			
+			case K_shift:
+				xy_move_speed++;
+				break;
+			case K_ctrl:
+				xy_move_speed--;
 				break;
 			
 			

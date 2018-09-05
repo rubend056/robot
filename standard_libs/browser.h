@@ -18,17 +18,17 @@ class Browser{
 		bool is_directory();
 		bool is_valid();
 		
+		void reload();
+		
 		void next();
 		void prev();
 		void in();
 		void out();
 		fs::path getPath();
+		fs::path getPath_dir();
 	private:
 		void begin();
 		string root_path;
-		
-		
-		
 		
 		
 		std::vector<string> names;

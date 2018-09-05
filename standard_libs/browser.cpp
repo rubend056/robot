@@ -6,6 +6,15 @@
 bool Browser::is_directory(){return directory;}
 bool Browser::is_valid(){return availables.size()>0 && file_count < availables.size() && file_count >= 0;}
 
+void Browser::reload(){
+	auto base_path = get_base_path();
+	availables.clear();
+	
+	auto availables_path = listFolder(fs::path(base_path.c_str()));
+	for(auto path : availables_path){
+		availables.push_back(path.filename().string());
+	}
+}
 void Browser::next(){
 	file_count++;
 	if(file_count>=availables.size())file_count = 0;
@@ -13,7 +22,8 @@ void Browser::next(){
 }
 void Browser::prev(){
 	file_count--;
-	if(file_count<0)file_count = availables.size()-1;
+	if (file_count<0)file_count = availables.size()-1;
+	if (availables.size() == 0)file_count = 0;
 	update();
 }
 void Browser::in(){
@@ -26,11 +36,14 @@ void Browser::out(){
 fs::path Browser::getPath(){
 	return fs::path(get_current_path());
 }
+fs::path Browser::getPath_dir(){
+	return fs::path(get_base_path());
+}
+
 
 void Browser::begin(){
 	clean();
 	update_root();
-	cout << availables.size() << endl;
 }
 void Browser::clean(){
 	int tocheck = root_path.length()-1;
@@ -50,23 +63,20 @@ string Browser::get_current_path(){
 	if (is_valid())out += '/' + availables[file_count];
 	return out;
 }
+
+
 void Browser::update(){
-	if(!is_valid())return;
-	auto current_path = get_current_path();
-	directory = fs::is_directory(fs::path(current_path.c_str()));
+	if(!is_valid()){directory = false;return;}
+	directory = fs::is_directory(fs::path(get_current_path().c_str()));
 }
 void Browser::update_root(){
-	auto base_path = get_base_path();
-	availables.clear();
-	
-	auto availables_path = listFolder(fs::path(base_path.c_str()));
-	for(auto path : availables_path){
-		availables.push_back(path.filename().string());
-	}
-	
+	reload();
 	file_count = 0;
 	update();
 }
+
+
+
 
 void Browser::append(string name){
 	names.push_back(name);

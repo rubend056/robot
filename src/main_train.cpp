@@ -225,11 +225,7 @@ int FANN_API callback(struct fann *ann, struct fann_train_data *train,
 		cv::imshow("Test", testMat);
 		waitKey(1);
 	}
-	// if (fann_get_train_stop_function(ann) == fann_stopfunc_enum::FANN_STOPFUNC_MSE){
-	// 	if(last_mse - mse <= 0)mse_fail_count++;else mse_fail_count = 0;
-	// 	if(mse_fail_count > 3)return -1;
-	// 	last_mse = mse;
-	// }
+	
 	if (mse < lowest_mse){
 		lowest_mse = mse;
 		saved_lowest = true;
@@ -237,7 +233,7 @@ int FANN_API callback(struct fann *ann, struct fann_train_data *train,
 	}
 	
 	Mat tmat(Size(300, 200), CV_8UC1, Scalar(0,0,0));
-	cv::imshow("Train", ip::showTraining(tmat, mse));
+	cv::imshow("Train", ip::showTraining (tmat, mse));
 	waitKey(1);
 	
 	if(!checkSig())return -1;
@@ -403,7 +399,7 @@ int main(int argc, char** argv)
 		auto cachePaths = listFolder(cacheDir);
 		int maxFiles = cachePaths.size();
 		
-		if(max > 0 && max < maxFiles){
+		if(max > 0 && max < maxFiles){ // In case we want to randomize the operation
 			vector<int> left(cachePaths.size());
 			vector<int> toUse;
 			for(int i = 0; i<left.size(); i++){
@@ -411,7 +407,7 @@ int main(int argc, char** argv)
 			}
 			for(int i = 0; i<left.size(); i++){ // Deleting any file that is not an image
 				auto ext = cachePaths[i].extension().string();
-				if(ext != ".jpg" || ext != ".jpeg" || ext != ".png")
+				if(ext != ".jpg" && ext != ".jpeg" && ext != ".png")
 					left.erase(left.begin() + i);
 			}
 			for(int i = 0; i<max; i++){

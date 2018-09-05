@@ -102,15 +102,8 @@ void nn::importFile(fs::path cacheDir, fs::path _path, vector<Object> objects){
 	auto mat = cv::imread (_path.string());
 	cv::Mat trainMat = ip::getTrainMat(mat); // Process to get train
 	
-	// auto preview_mat = mat.clone();
-
-	// writeObjects(preview_mat, objects);
-	// cv::imshow("Importing..", preview_mat);
-
-	// waitKey(2);
-	
 	//Saving file to cache
-	imwrite((cacheDir.string() + "/" + Object::getString(objects) + "-" + to_string(import_count++) + ".jpg").c_str(), trainMat);
+	imwrite((cacheDir.string() + "/" + to_string(import_count++) + "-" + Object::getString(objects) + ".jpg").c_str(), trainMat);
 }
 // * --------------------------------------------
 

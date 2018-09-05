@@ -44,9 +44,13 @@ string Object::getFileName(){ //We'll implement this later
 
 void Object::useFilename(string name){
 	//Deleting any extension still prevailing in the name
-	auto dotIndex = name.find_last_of('.');
+	auto dotIndex = name.find_first_of('.');
 	if(dotIndex != -1)
 		name.substr(dotIndex, name.length() - dotIndex);
+	
+	dotIndex = name.find_last_of('-');
+	if(dotIndex != -1)
+		name.substr(0, dotIndex + 1);
 	
 	//Deleting any "other" extension still prevailing in the name
 	// dotIndex = name.find("-");
