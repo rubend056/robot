@@ -52,3 +52,21 @@ The official code is hosted [Here](https://github.com/ieeefiu/robot2019)
 ### For multiple objects
 * We will feed the extracted color mask, value/lightness only image to both neural networks, if anything is found, then set the pixels of found object will be zeroed and the process will be repeated until nothing more is found
 
+## There are 4 main programs
+### Train
+Contains everything required to import image database and train a neural network
+### Execute
+Will take a trained network and apply it on camera images, this is what will run in the robot
+### Camera
+Will take images and store them in the database
+* Number in top left is image count
+* R: Toggles the record mode
+* Spacebar: Takes a picture
+### Edit
+Will be able to classify the images in the database
+* Up, Down, Left, Right: Move within files
+* W, A, S, D: Move the box
+* T, F, G, H: Resize the box
+* R: Reset box to the middle
+* E: Toggle the changed state, if changed state is ON, the file will be saved when another file is loaded. Please only save when the box is in the right place.
+* Shift, Ctrl: Increase or decrease the box move amount
