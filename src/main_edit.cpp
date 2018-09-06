@@ -17,13 +17,14 @@ const int K_LEFT = 81, K_UP = 82, K_RIGHT = 83, K_DOWN = 84, K_ESC = 27;
 const int K_a = 97, K_s = 115, K_d = 100, K_w = 119;
 const int K_f = 102, K_g = 103, K_h = 104, K_t = 116;
 const int K_shift = 225, K_ctrl = 227;
-const int K_r = 114;
+const int K_r = 114, K_e = 101;
 
 Mat image;
 Object o;
 Browser *br;
 
-auto header_size = Size(1000,30);
+bool changed = false;
+auto header_size = Size(500,20);
 
 int xy_move_speed = 4;
 // int wh_move_speed = 1;
@@ -38,12 +39,13 @@ void update_image(){
 	auto height = header_size.height/2;
 	Scalar font_color(255,255,255);
 	int baseline = 0;
-	auto font_face = FONT_HERSHEY_SIMPLEX;
-	double font_size = 0.5;
+	double font_size = 0.4;
 	double font_width = 1;
 
 	auto count_text = (boost::format("%1%/%2%") % br->file_count % br->availables.size()).str();
-	putText(header, count_text, Point(2,height+4), font_face, font_size, font_color, font_width);
+	auto count_color = font_color;
+	if (changed){count_text += "  Changed";count_color = cv::Scalar(0,255,255);}
+	putText(header, count_text, Point(2,height), font_face, font_size, count_color, font_width);
 	
 	string path_string = br->getPath().string();
 	auto path_size = getTextSize(path_string, font_face, font_size, font_width, &baseline);
@@ -76,22 +78,27 @@ void reset_object(){
 	o.y = 300;
 	o.w = 200;
 	o.h = 200;
-}
-
-void save_image(){
-	if (editing){
-		// cout << "Image has cols " << image.cols << endl;
-		fs::remove(edit_path);
-		imwrite(br->getPath_dir().string() + '/' + to_string(image_count) + '-' + o.getFileName() + ".jpg", image);
-		image.release();
-		br->reload();
-		editing = false;
+	if (!image.empty()){
+		o.x = image.cols/2 - o.w/2;
+		o.y = image.rows/2 - o.h/2;
 	}
 }
 
+void save_image(){
+	if (editing && changed){
+		// cout << "Image has cols " << image.cols << endl;
+		fs::remove(edit_path);
+		std::string count_string = (boost::format("%|06d|") % image_count).str();
+		imwrite(br->getPath_dir().string() + '/' + count_string + '-' + o.getFileName() + ".jpg", image);
+		image.release();
+		br->reload();
+	}
+	changed = false;
+	editing = false;
+}
+
 void load_image(){
-	if (editing)
-		save_image();
+	save_image();
 	
 	if (br->is_valid() && !br->directory){
 		// Read the image
@@ -105,11 +112,9 @@ void load_image(){
 		image_count = getInt(segments[0]);
 		if (segments.size() > 1)
 			o.useFilename(segments[1]);
-		else {
-			reset_object();
-			o.x = image.cols/2 - o.w/2;
-			o.y = image.rows/2 - o.h/2;
-		}
+		// else 
+		// 	reset_object();
+		
 		
 		editing = true;
 	}else {image.release();editing = false;}
@@ -184,11 +189,9 @@ int main(int argc, char** argv)
 				break;
 				
 			case K_r:
-				o.x = 0;
-				o.y = 0;
-				o.w = 20;
-				o.h = 20;
+				reset_object();
 				break;
+			
 			
 			case K_shift:
 				xy_move_speed++;
@@ -197,10 +200,25 @@ int main(int argc, char** argv)
 				xy_move_speed--;
 				break;
 			
+			case K_e:
+				changed = !changed;
+				break;
 			
 			default:
 				cout << "Pressed: " << key << endl;
 
+		}
+		switch(key){
+			case K_a:
+			case K_d:
+			case K_w:
+			case K_s:
+			case K_f:
+			case K_h:
+			case K_t:
+			case K_g:
+				changed = true;
+				break;
 		}
 		
 		update_image();

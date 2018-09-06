@@ -14,6 +14,8 @@ const string cache_dir_name =			"cache";
 const string train_data_dir_name =		"train_data";
 const string nn_dir_name = 				"neural_networks";
 
+const auto font_face = cv::FONT_HERSHEY_SIMPLEX;
+
 static const int resx = 89, resy = 50;
 
 class Object{

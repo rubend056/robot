@@ -6,8 +6,6 @@
 
 #include "arg_helper.h"
 
-#include <iostream>
-
 using namespace cv;
 
 VideoCapture cap;
@@ -71,15 +69,12 @@ int main(int argc, char** argv)
 	setArgs(argc, argv);
 	bool video = false;
 	
-	c_arg = 1;
-	if(!checkArg())return 1;
-	
 	auto nnPath = concatPath(fs::current_path(), nn_dir_name);
 	if(!exists(nnPath)){fs::create_directory(nnPath);}
 	
-	// string nn_name = ;
+	c_arg = 1;
+	if(!checkArg())return 1;
 	nnPath = concatPath(nnPath, useArg());
-	// ann = ann_load(nnPath);
 	
 	auto command = useArg();
 	if(command == "camera"){

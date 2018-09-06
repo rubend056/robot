@@ -1,7 +1,5 @@
 #include "browser.h"
 
-// Browser::Browser(fs::path r_path):root_path(r_path.c_str()){begin();}
-// Browser::Browser(string r_path):root_path(r_path)
 
 bool Browser::is_directory(){return directory;}
 bool Browser::is_valid(){return availables.size()>0 && file_count < availables.size() && file_count >= 0;}

@@ -2,18 +2,16 @@
 #define ARG_HELPER
 
 #include <string>
-#include <iostream>
-using namespace std;
 
 extern int c_arg;
 
-void usage(const char* comm);
-
-string getArg(int shift = 0);
-string useArg();
+std::string getArg(int shift = 0);
+std::string useArg();
 bool checkArg(int count = 0, bool usag = true);
 void setArgs(int argc, char** argv);
 
-// void setArgC(int val);
+
+// YOU NEED TO IMPLEMENT THIS
+void usage(const char* comm);
 
 #endif

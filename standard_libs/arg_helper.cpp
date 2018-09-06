@@ -1,5 +1,7 @@
 #include "arg_helper.h"
 
+using namespace std;
+
 int arg_c;
 char** arg_v;
 int c_arg = 1;
