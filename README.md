@@ -1,7 +1,7 @@
 ## IEEE Robot Computer Vision
 
 This is the code for a robot IEEE is doing in FIU for the SouthwestCon19 competition. This code will run on the Odroid board
-The official code is hosted [here] (https://github.com/ieeefiu/robot2019)
+The official code is hosted [Here](https://github.com/ieeefiu/robot2019)
 
 
 ### Required libraries:
@@ -37,15 +37,15 @@ The official code is hosted [here] (https://github.com/ieeefiu/robot2019)
 
 8. The data file to be outputted for neural network training will be something like this:
 
-9. .data file structure
-  * num_train_data num_input num_output
-  * inputdata seperated by space
-  * outputdata seperated by space
-  * .
-  * .
-  * .
-  * inputdata seperated by space
-  * outputdata seperated by space
+#### .data file structure
+  num_train_data num_input num_output  
+  inputdata seperated by space  
+  outputdata seperated by space  
+  .  
+  .  
+  .  
+  inputdata seperated by space  
+  outputdata seperated by space  
 
 * We will train two neural networks, one for recognizing spheres, another for recognizing cubes
 
