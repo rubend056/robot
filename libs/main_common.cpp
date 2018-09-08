@@ -43,14 +43,7 @@ string Object::getFileName(){ //We'll implement this later
 }
 
 void Object::useFilename(string name){
-	//Deleting any extension still prevailing in the name
-	auto dotIndex = name.find_first_of('.');
-	if(dotIndex != -1)
-		name.substr(dotIndex, name.length() - dotIndex);
-	
-	dotIndex = name.find_last_of('-');
-	if(dotIndex != -1)
-		name.substr(0, dotIndex + 1);
+
 	
 	//Deleting any "other" extension still prevailing in the name
 	// dotIndex = name.find("-");
@@ -102,4 +95,49 @@ void writeObjects(cv::Mat src, vector<Object> objs){
 void writeObjects(cv::Mat src, Object obj){
 	vector<Object> objs = {obj};
 	writeObjects(src, objs);
+}
+
+
+
+void clean(std::string &data_path){
+	int tocheck = data_path.length()-1;
+	if (data_path[tocheck] == '/')
+		data_path.erase(tocheck, 1);
+}
+
+std::string get_count_string(int count){
+	return (boost::format("%|06d|") % count).str();
+}
+
+void save_DB_image(std::string folder, int count, Object &o, cv::Mat &mat){
+	clean(folder);
+	
+	cv::imwrite(folder + "/" + get_count_string(count) + "-" + o.getFileName() + ".jpg", mat);
+}
+void load_DB_image(std::string path, int &count, Object &o, cv::Mat &mat){
+	clean(path);
+	
+	mat = cv::imread(path);
+	
+	//Isolating filename
+	int last_slash = path.find_last_of('/');
+	if (last_slash == -1)last_slash = 0;
+	auto filename = path.substr(last_slash + 1);
+	
+	//Setting up extension indexes
+	auto dot_index = filename.find_first_of('.');
+	auto min_index = filename.find_first_of('-');
+	min_index++; // If not found, then 0, if found then on top of char
+	if (dot_index == -1)dot_index = filename.size()-1;
+	
+	//Do the cutting
+	auto obj_string = filename.substr(min_index, dot_index - min_index);
+	
+	if (min_index == 0)min_index = dot_index;else min_index--;
+	auto counter_string = filename.substr(0, min_index);
+	
+	// cout << "Object string: " << obj_string << "   Counter: " << counter_string << endl;
+	
+	o.useFilename(obj_string);
+	count = getInt(counter_string);
 }

@@ -36,23 +36,15 @@ class Object{
 		
 		int x = 0, y = 0; //Position of the object in the screen
 		int w = 0, h = 0; //The width and height of the object in the screen
-		// void shift(float shift){
-		// 	x+=shift;
-		// 	y+=shift;
-		// }
-		// void mult(float mult){
-		// 	x*=mult;
-		// 	y*=mult;
-		// 	w*=mult;
-		// 	h*=mult;
-		// }
-		// void div(float div){
-		// 	mult(1/div);
-		// }
 	private:
 };
 
 bool generalFolder(string name);
+
+void save_DB_image(std::string folder, int count, Object &o, cv::Mat &mat);
+void load_DB_image(std::string path, int &count, Object &o, cv::Mat &mat);
+
+
 
 //To make an overlay into the given Mat that shows all objects, their identified color and type
 void writeObjects(cv::Mat src, vector<Object> objs);

@@ -17,7 +17,7 @@ const int K_LEFT = 81, K_UP = 82, K_RIGHT = 83, K_DOWN = 84, K_ESC = 27;
 const int K_a = 97, K_s = 115, K_d = 100, K_w = 119;
 const int K_f = 102, K_g = 103, K_h = 104, K_t = 116;
 const int K_shift = 225, K_ctrl = 227;
-const int K_r = 114, K_e = 101;
+const int K_r = 114, K_e = 101, K_q=113, K_y=121, K_u=117;
 
 Mat image;
 Object o;
@@ -83,13 +83,17 @@ void reset_object(){
 		o.y = image.rows/2 - o.h/2;
 	}
 }
+void zero_object(){
+	o.x = 0;
+	o.y = 0;
+	o.w = 0;
+	o.h = 0;
+}
 
 void save_image(){
 	if (editing && changed){
-		// cout << "Image has cols " << image.cols << endl;
 		fs::remove(edit_path);
-		std::string count_string = (boost::format("%|06d|") % image_count).str();
-		imwrite(br->getPath_dir().string() + '/' + count_string + '-' + o.getFileName() + ".jpg", image);
+		save_DB_image(br->getPath_dir().string(), image_count, o, image);
 		image.release();
 		br->reload();
 	}
@@ -101,20 +105,8 @@ void load_image(){
 	save_image();
 	
 	if (br->is_valid() && !br->directory){
-		// Read the image
-		edit_path = br->getPath();
-		image = cv::imread(edit_path.string());
 		
-		// Decompose the filename
-		vector<string> segments;
-		boost::split(segments, br->getPath().filename().string(), boost::is_any_of("-"));
-		
-		image_count = getInt(segments[0]);
-		if (segments.size() > 1)
-			o.useFilename(segments[1]);
-		// else 
-		// 	reset_object();
-		
+		load_DB_image(br->getPath().string(), image_count, o, image);
 		
 		editing = true;
 	}else {image.release();editing = false;}
@@ -160,6 +152,14 @@ int main(int argc, char** argv)
 				browser.next();
 				load_image();
 				break;
+			case K_y:
+				browser.next();
+				load_image();
+				break;
+			case K_u:
+				browser.prev();
+				load_image();
+				break;
 			
 			// Editing output
 			case K_a:
@@ -190,6 +190,10 @@ int main(int argc, char** argv)
 				
 			case K_r:
 				reset_object();
+				break;
+			case K_q:
+				zero_object();
+				changed = true;
 				break;
 			
 			
