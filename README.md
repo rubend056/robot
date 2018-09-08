@@ -68,5 +68,6 @@ Will be able to classify the images in the database
 * W, A, S, D: Move the box
 * T, F, G, H: Resize the box
 * R: Reset box to the middle
+* Q: Set box psition and size all to zero, and set changed to ON. Do this the box doesn't appear on the image
 * E: Toggle the changed state, if changed state is ON, the file will be saved when another file is loaded. Please only save when the box is in the right place.
-* Shift, Ctrl: Increase or decrease the box move amount
+* Shift, Ctrl: Increase and decrease respectively, changing the box move amount
