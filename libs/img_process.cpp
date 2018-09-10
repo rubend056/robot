@@ -45,6 +45,20 @@ Mat ip::extractColor (Mat hsvMat, Color col){
 	return mask;
 }
 
+Mat relativeColor(Mat hsvMat, Color col){
+	std::vector<cv::Mat> hsv_split;cv::split(hsvMat, hsv_split); // Split the hsv image
+	Mat outMat(Size(hsvMat.cols, hsvMat.rows), CV_8UC1, Scalar(0,0,0)); // Create the output image
+	
+	for(int i=0; i<hsvMat.rows; i++){
+	    for(int j=0; j<hsvMat.cols; j++){
+	        auto hue_val = ((float)hsv_split[0].at<uchar>(i,j)) / 255; // Normalized hue value
+	        auto val_val = ((float)hsv_split[2].at<uchar>(i,j)) / 255; // Normalized value
+	        
+	    }
+	}
+	
+}
+
 Mat ip::processMat(Mat mat, Color col){
 	Mat hsv = getHSV(mat);
 	Mat defmask = extractColor(hsv, col);

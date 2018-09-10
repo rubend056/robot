@@ -205,8 +205,19 @@ bool saved_lowest = false;
 float lowest_mse = 1;
 fs::path output_path;
 
-// float last_mse;
-// int mse_fail_count;
+
+fs::path cacheDir;
+
+void import(fs::path folder){
+	auto paths = listFolder(folder);
+	for (auto rootit = paths.begin(); rootit != paths.end(); ++rootit){
+		if(is_directory(*rootit)){
+			import(*rootit);
+		}else if (is_regular_file(*rootit)){
+			nn::importFile(cacheDir, *rootit, Object::getObjects((*rootit).filename().string()));
+		}
+	}
+}
 
 cv::Mat testMat;
 
@@ -252,7 +263,7 @@ int main(int argc, char** argv)
 	if(!checkArg())return 1; // Check if we at least have 1 command
 	
 	//Create the cache dir if it doesn't exist
-	auto cacheDir = concatPath(fs::current_path(), cache_dir_name);
+	cacheDir = concatPath(fs::current_path(), cache_dir_name);
 	if(!exists(cacheDir)){fs::create_directory(cacheDir);}
 	nnPath = concatPath(fs::current_path(), nn_dir_name);
 	if(!exists(nnPath)){fs::create_directory(nnPath);}
@@ -346,38 +357,8 @@ int main(int argc, char** argv)
 		fs::path trainPath(useArg());
 		cout << "Populating cache with data from " << trainPath << endl;
 		
-		auto rootPaths = listFolder(trainPath);
-		for (auto rootit = rootPaths.begin(); rootit != rootPaths.end(); ++rootit){
-			
-			if(is_directory(*rootit)){
-				cout << "Going through dir " << (*rootit).string() << endl;
-				auto dirfiles = listFolder(*rootit);
-				bool specific = false;
-				vector<Object> objects;
-				if(!generalFolder ((*rootit).string())){
-					cout << "Not a general folder, will use folder name" << endl;
-					//Defined specific, now extract Objects from the dir name
-					specific = true;
-					objects = Object::getObjects((*rootit).filename().string());
-					cout << "Folder name object is " << Object::getString(objects) << endl;
-				}
-				
-				for (auto dirit = dirfiles.begin(); dirit != dirfiles.end(); ++dirit){
-					if (is_regular_file(*dirit)){
-						cout << "	importing " << (*dirit).string() << endl;
-						// dirit has file path for all files inside rootit
-						// Now import the file
-						
-						if(!specific)objects = Object::getObjects((*dirit).filename().string());
-						nn::importFile(cacheDir, *dirit, objects);
-					}
-				}
-			}else if (is_regular_file(*rootit)){
-				cout << "importing " << (*rootit).string() << endl;
-				//Pass *rootit to the file parser
-				nn::importFile(cacheDir, *rootit, Object::getObjects((*rootit).filename().string()));
-			}
-		}
+		import(trainPath);
+		
 		nn::setCountFile(cacheDir);
 	}else if(command == "create_data"){
 		if(!checkArg()){return 1;} // Check if we at least have 2 commands

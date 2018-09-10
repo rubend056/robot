@@ -45,8 +45,6 @@ class TrainData{
 		};
 		static vector<float> getInputs(Mat mat){
 			vector<float> out;
-			// vector<uchar> array;array.reserve(num_input);
-			// array.assign(mat.datastart, mat.dataend);
 			
 			MatIterator_<uchar> it, end;
 			for( it = mat.begin<uchar>(), end = mat.end<uchar>(); it != end; ++it)
@@ -54,9 +52,6 @@ class TrainData{
 				out.push_back (((float)(*it)) / 255);
 			}
 			
-			// for(auto it = array.begin(); it != array.end(); ++it){
-			// 	out.push_back (((float)(*it)) / 255);
-			// }
 			return out;
 		}
 		
@@ -103,7 +98,8 @@ void nn::importFile(fs::path cacheDir, fs::path _path, vector<Object> objects){
 	cv::Mat trainMat = ip::getTrainMat(mat); // Process to get train
 	
 	//Saving file to cache
-	imwrite((cacheDir.string() + "/" + to_string(import_count++) + "-" + Object::getString(objects) + ".jpg").c_str(), trainMat);
+	save_DB_image(cacheDir.string(), import_count++, objects[0], trainMat);
+	// imwrite((cacheDir.string() + "/" + to_string(import_count++) + "-" + Object::getString(objects) + ".jpg").c_str(), trainMat);
 }
 // * --------------------------------------------
 
@@ -145,18 +141,8 @@ void nn::saveTrainData(fs::path savePath){
 
 struct fann* nn::ann_load(fs::path nn_path){
 	if(!fs::exists(nn_path) || !fs::is_regular_file(nn_path)){cout << "either nn_path doesn't exist, or it is not a file" << endl;exit(1);}
-	struct fann *ann = fann_create_from_file(nn_path.c_str());
-	return ann;
+	return fann_create_from_file(nn_path.c_str());
 }
-// struct fann *cube_ann, *sphere_ann;
-// void loadNNs(fs::path cube_nn_path, fs::path sphere_nn_path){
-// 	cube_ann = ann_load(cube_nn_path);
-// 	sphere_ann = ann_load(sphere_nn_path);
-// }
-// void freeNNs(){
-// 	if(cube_ann)fann_destroy(cube_ann);
-// 	if(sphere_ann)fann_destroy(sphere_ann);
-// }
 
 Object nn::execute(Mat mat, struct fann* ann, int actual_w, int actual_h){
 	Object o;
@@ -194,12 +180,10 @@ Object nn::execute(Mat mat, struct fann* ann, int actual_w, int actual_h){
 
 Object nn::execute_test_cube_nn(Mat mat, int actual_w, int actual_h, fs::path cubeNNPath){
 	auto ann = ann_load(cubeNNPath);
-	// Object o;
-	// if(ann){
-	// cout << "		Executing" << endl;
+	
 	auto o = execute(mat, ann, actual_w, actual_h);
 	fann_destroy(ann);
-	// }
+	
 	return o;
 }
 // vector<Object> nn::execute(Mat mat){

@@ -105,9 +105,8 @@ void load_image(){
 	save_image();
 	
 	if (br->is_valid() && !br->directory){
-		
-		load_DB_image(br->getPath().string(), image_count, o, image);
-		
+		edit_path = br->getPath();
+		load_DB_image(edit_path.string(), image_count, o, image);
 		editing = true;
 	}else {image.release();editing = false;}
 }
@@ -125,8 +124,6 @@ int main(int argc, char** argv)
 	
 	load_image();
 	update_image();
-	
-	
 
 	while(1){
 		auto key = waitKey(0);

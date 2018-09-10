@@ -16,9 +16,9 @@ bool checkSig(){
 	return (bool)keepRunning;
 }
 
-bool generalFolder(string name){ // General folders hold no object data in folder name and all files provide their own data
-	return name.find("_") == -1;
-}
+// bool generalFolder(string name){ // General folders hold no object data in folder name and all files provide their own data
+// 	return name.find("_") == -1;
+// }
 cv::Mat getHSV(cv::Mat mat){
 	cv::Mat hsv;
 	cv::cvtColor(mat, hsv, cv::COLOR_BGR2HSV);
@@ -53,7 +53,7 @@ void Object::useFilename(string name){
 	
 	vector<string> strings;
 	boost::split(strings, name, boost::is_any_of("_"));
-	if(strings.size() < 5){cout << "Size " << strings.size() << " less than 5" << endl; return;} //Check if size less than 5
+	if(strings.size() < 5){/*cout << "Size " << strings.size() << " less than 5" << endl; */return;} //Check if size less than 5
 	
 	if(strings[0] == "cube")type = Cube;
 	if(strings[0] == "sphere")type = Sphere;

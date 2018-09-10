@@ -1,7 +1,7 @@
 ## IEEE Robot Computer Vision
 
 This is the code for a robot IEEE is doing in FIU for the SouthwestCon19 competition. This code will run on the Odroid board
-The official code is hosted [Here](https://github.com/ieeefiu/robot2019)
+The official and, for the most part outdated code, is hosted [Here](https://github.com/ieeefiu/robot2019)
 
 
 ### Required libraries:
