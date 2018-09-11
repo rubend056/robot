@@ -26,7 +26,6 @@ void startCap(int camera_numb = 0){
 	}
 }
 
-fann *ann;
 string img_path = "";
 // vector<Object> objs;
 void capture(){
@@ -40,12 +39,26 @@ void capture(){
 	if(rawMat.empty())return;
 	cvtColor(rawMat, hsvMat, COLOR_BGR2HSV); //Extract the HSV color space from image
 }
-void process(fs::path nn_path){
+
+int average_count = 30;
+vector<Object> objects;
+void process(fann* ann){
 	if(rawMat.empty())return;
 	
 	auto blueMat = ip::processMat(rawMat, ip::colors[2]);
 	
-	writeObjects(rawMat, nn::execute_test_cube_nn(blueMat,rawMat.rows, rawMat.cols, nn_path));
+	Object write_obj;
+	auto obj = nn::execute_test_cube_nn(blueMat,rawMat.rows, rawMat.cols, ann);
+	objects.push_back(obj);
+	while(objects.size() > average_count)objects.erase(objects.begin());
+	for(auto sobj: objects){
+		write_obj.x += sobj.x / average_count;
+		write_obj.y += sobj.y / average_count;
+		write_obj.w += sobj.w / average_count;
+		write_obj.h += sobj.h / average_count;
+	}
+	
+	writeObjects(rawMat, write_obj);
 	
 	finalMat = rawMat;
 }
@@ -64,6 +77,7 @@ void setFinal(Mat mat){finalMat = mat;}
 // 	return ann;
 // }
 
+fann* ann;
 int main(int argc, char** argv)
 {
 	setArgs(argc, argv);
@@ -75,6 +89,7 @@ int main(int argc, char** argv)
 	c_arg = 1;
 	if(!checkArg())return 1;
 	nnPath = concatPath(nnPath, useArg());
+	ann = nn::ann_load(nnPath);
 	
 	auto command = useArg();
 	if(command == "camera"){
@@ -102,14 +117,14 @@ int main(int argc, char** argv)
 		while(waitKey(30) != 27){ //While ESC not pressed
 			capture();
 			// cout << "Captured" << endl;
-			process(nnPath);
+			process(ann);
 			// cout << "Processed" << endl;
 			display();
 			// cout << "Displayed" << endl;
 		}
 	}else{
 		capture();
-		process(nnPath);
+		process(ann);
 		display();
 		
 		waitKey(0);
@@ -117,6 +132,7 @@ int main(int argc, char** argv)
 	
 	if(cap.isOpened())cap.release();
 	destroyAllWindows();
+	fann_destroy(ann);
 	
 	return 0;
 }

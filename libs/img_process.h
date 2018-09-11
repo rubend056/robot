@@ -23,7 +23,7 @@ namespace ip{
 	};
 
 	//Define all the colors
-	const vector<Color> colors = {/*BLUE 178-260*/ Color(219, 41), /*GREEN 90-150*/ Color(120, 30), /*RED 0-20 340-360*/ Color(0, 20), /*YELLOW 30-90*/ Color(60, 30)};
+	const vector<Color> colors = {/*BLUE 178-260*/ Color(219, 41), /*GREEN 90-150*/ Color(120, 30), /*RED 0-29 331-360*/ Color(0, 29), /*YELLOW 30-90*/ Color(60, 30)};
 	
 	//Uses main.h function of getRGB and getHSV to get image and process it, dividing it into objects
 	Mat processMat(Mat mat, Color col);

@@ -29,7 +29,7 @@ namespace nn{
 
 	vector<Object> execute(cv::Mat mat);
 	Object execute(Mat mat, struct fann* ann, int actual_w, int actual_h);
-	Object execute_test_cube_nn(cv::Mat mat, int actual_w, int actual_h, fs::path cubeNNPath);
+	Object execute_test_cube_nn(cv::Mat mat, int actual_w, int actual_h, fann* ann);
 
 	struct fann* ann_load(fs::path nn_path);
 	void saveTrainData(fs::path cacheDir);

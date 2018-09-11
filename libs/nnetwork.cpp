@@ -1,5 +1,7 @@
 #include "nnetwork.h"
 #include "img_process.h"
+#include <iostream>
+#include <fstream>
 
 unsigned int max_epochs = 1000;
 float desired_error = 0.0001f;
@@ -114,28 +116,24 @@ void nn::readFile(fs::path filePath){
 }
 
 void nn::saveTrainData(fs::path savePath){
-	string toWrite = "";
 	
-	toWrite += train_data.size() + ' ' + num_input + ' ' + num_output + '\n';
+	std::ofstream dfile(savePath.c_str());
+	dfile << train_data.size() << ' ' << num_input << ' ' << num_output << '\n';
 	for(auto it = train_data.begin(); it != train_data.end(); ++it){
 		auto input = &(*it).input;
 		auto output = (*it).output;
 		
 		for(auto dit = input->begin(); dit != input->end(); ++dit){
-			if(dit != input->begin())toWrite += ' ';
-			toWrite += *dit;
+			if(dit != input->begin())dfile << ' ';
+			dfile << *dit;
 		}
-		toWrite += '\n';
+		dfile << '\n';
 		for(int i = 0; i < num_output; i++){
-			if(i != 0)toWrite += ' ';
-			toWrite += output[i];
+			if(i != 0)dfile << ' ';
+			dfile << output[i];
 		}
-		toWrite += '\n';
+		dfile << '\n';
 	}
-	
-	ofstream dfile;
-	dfile.open(savePath.c_str());
-	dfile << toWrite.c_str();
 	dfile.close();
 }
 
@@ -178,11 +176,8 @@ Object nn::execute(Mat mat, struct fann* ann, int actual_w, int actual_h){
 	return o;
 }
 
-Object nn::execute_test_cube_nn(Mat mat, int actual_w, int actual_h, fs::path cubeNNPath){
-	auto ann = ann_load(cubeNNPath);
-	
+Object nn::execute_test_cube_nn(Mat mat, int actual_w, int actual_h, fann* ann){
 	auto o = execute(mat, ann, actual_w, actual_h);
-	fann_destroy(ann);
 	
 	return o;
 }
