@@ -1,5 +1,6 @@
 #include "main.h"
 #include "arg_helper.h"
+#include "input.h"
 
 #include <time.h>
 
@@ -11,21 +12,11 @@ int image_count = 0;
 
 string data_path;
 
-const int K_ESC = 27, K_r = 114, K_space = 32;
+
 
 void usage(const char* comm){
 	cout << "Usage: " << comm << "  <path_to_data_folder> <arguments>" << endl;
 	cout << "	-cam   <int camera_numb = 0>" << endl;
-}
-
-void startCap(int camera_numb = 0){
-	cap = cv::VideoCapture(camera_numb);
-	
-	// Check if camera opened successfully
-	if(!cap.isOpened()){
-		cout << "Error opening video stream" << endl;
-		exit(1);
-	}
 }
 
 void capture(){
@@ -109,7 +100,8 @@ int main(int argc, char** argv)
 		}
 	}
 	
-	startCap(camera_numb);
+	cap = startCamera(camera_numb);
+	cout << "Test" << endl;
 	
 	// Get every key pressed and store it in a vector, while waiting for the right time and update
 	bool running = true;
@@ -139,7 +131,8 @@ int main(int argc, char** argv)
 						start_video();
 					break;
 				default:
-					std::cout << "Pressed: " << key << std::endl;
+					if (!handleCameraInput(cap, key))
+						std::cout << "Pressed: " << key << std::endl;
 					break;
 			}
 		}

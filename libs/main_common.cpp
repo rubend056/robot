@@ -4,6 +4,8 @@
 #include <boost/format.hpp>
 #include <sstream>
 
+#include "input.h"
+
 bool tCascade = false;
 
 static volatile sig_atomic_t keepRunning = true;
@@ -16,9 +18,6 @@ bool checkSig(){
 	return (bool)keepRunning;
 }
 
-// bool generalFolder(string name){ // General folders hold no object data in folder name and all files provide their own data
-// 	return name.find("_") == -1;
-// }
 cv::Mat getHSV(cv::Mat mat){
 	cv::Mat hsv;
 	cv::cvtColor(mat, hsv, cv::COLOR_BGR2HSV);
@@ -43,14 +42,6 @@ string Object::getFileName(){ //We'll implement this later
 }
 
 void Object::useFilename(string name){
-
-	
-	//Deleting any "other" extension still prevailing in the name
-	// dotIndex = name.find("-");
-	// if(dotIndex != -1) 
-	// 	name.substr(dotIndex, name.length() - dotIndex);
-	
-	
 	vector<string> strings;
 	boost::split(strings, name, boost::is_any_of("_"));
 	if(strings.size() < 5){/*cout << "Size " << strings.size() << " less than 5" << endl; */return;} //Check if size less than 5
@@ -62,7 +53,6 @@ void Object::useFilename(string name){
 	y = getInt(strings[2]); //Set posy
 	w = getInt(strings[3]); //Set width
 	h = getInt(strings[4]); //Set height
-	
 }
 
 vector<Object> Object::getObjects(string name){
@@ -140,4 +130,63 @@ void load_DB_image(std::string path, int &count, Object &o, cv::Mat &mat){
 	
 	o.useFilename(obj_string);
 	count = getInt(counter_string);
+}
+
+void set_and_print(cv::VideoCapture &cap, int propID, std::string propString, double value){
+	cap.set(propID, value);
+	cout << "Camera " << propString << ": " << cap.get(propID) << endl;
+}
+
+double hue = 0.5, sat = 0.25, cont = 0.5;
+cv::VideoCapture startCamera(int index){
+	auto cap = cv::VideoCapture(index);
+	set_and_print(cap, cv::CAP_PROP_FPS, "FPS", 30);
+	set_and_print(cap, cv::CAP_PROP_HUE, "Hue", hue);
+	set_and_print(cap, cv::CAP_PROP_SATURATION, "Saturation", sat);
+	set_and_print(cap, cv::CAP_PROP_CONTRAST, "Contrast", cont);
+	
+	// cout << "Camera " << cap.get(cv::CAP_PROP_GAMMA) << endl;
+	// cout << "Camera " << cap.get(cv::CAP_PROP_AUTO_EXPOSURE) << endl;
+	// cout << "Camera " << cap.get(cv::CAP_PROP_EXPOSURE) << endl;
+	// cout << "Camera " << cap.get(cv::CAP_PROP_EXPOSUREPROGRAM) << endl;
+	// cout << "Camera " << cap.get(cv::CAP_PROP_BRIGHTNESS) << endl;
+	// cout << "Camera " << cap.get(cv::CAP_PROP_TEMPERATURE) << endl;
+	
+	// Check if camera opened successfully
+	if(!cap.isOpened()){
+		cout << "Error opening video stream" << endl;
+		exit(1);
+	}
+	return cap;
+}
+bool handleCameraInput(cv::VideoCapture &cap, int key){
+	switch(key){
+		case K_z:
+			hue -= 0.01;
+			set_and_print(cap, cv::CAP_PROP_HUE, "Hue", hue);
+			break;
+		case K_x:
+			hue += 0.01;
+			set_and_print(cap, cv::CAP_PROP_HUE, "Hue", hue);
+			break;
+		case K_c:
+			sat -= 0.01;
+			set_and_print(cap, cv::CAP_PROP_SATURATION, "Saturation", sat);
+			break;
+		case K_v:
+			sat += 0.01;
+			set_and_print(cap, cv::CAP_PROP_SATURATION, "Saturation", sat);
+			break;
+		case K_b:
+			cont -= 0.01;
+			set_and_print(cap, cv::CAP_PROP_CONTRAST, "Contrast", cont);
+			break;
+		case K_n:
+			cont += 0.01;
+			set_and_print(cap, cv::CAP_PROP_CONTRAST, "Contrast", cont);
+			break;
+		default:
+			return false;
+	}
+	return true;
 }

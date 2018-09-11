@@ -3,6 +3,7 @@
 #include "logic_process.h"
 #include "nnetwork.h"
 #include "fann.h"
+#include "input.h"
 
 #include "arg_helper.h"
 
@@ -17,14 +18,6 @@ void usage(const char* comm){
 	cout << "	image    <path_to_image>" << endl;
 }
 
-void startCap(int camera_numb = 0){
-	cap = VideoCapture(camera_numb);
-	
-	// Check if camera opened successfully
-	if(!cap.isOpened()){
-		cout << "Error opening video stream" << endl;
-	}
-}
 
 string img_path = "";
 // vector<Object> objs;
@@ -61,6 +54,7 @@ void process(fann* ann){
 	writeObjects(rawMat, write_obj);
 	
 	finalMat = rawMat;
+	cv::imshow("Filter", blueMat);
 }
 void display(){
 	if(!finalMat.empty())imshow("Final", finalMat);
@@ -94,9 +88,9 @@ int main(int argc, char** argv)
 	auto command = useArg();
 	if(command == "camera"){
 		if(checkArg(0,false))//If there's one more argument
-			startCap(getInt(getArg()));
+			cap = startCamera(getInt(getArg()));
 		else
-			startCap();
+			cap = startCamera();
 		cout << "Camera opened sucessfully" << endl;
 		
 		video = true;
@@ -114,13 +108,20 @@ int main(int argc, char** argv)
 	// namedWindow("Final", WINDOW_NORMAL);
 	// resizeWindow("Final", Size(512,384));
 	if(video){
-		while(waitKey(30) != 27){ //While ESC not pressed
+		bool running = true;
+		while(running){ //While ESC not pressed
+			int key = waitKey(30);
+			switch(key){
+				case K_ESC:
+					running = false;
+					break;
+				default:
+					handleCameraInput(cap, key);
+			}
 			capture();
-			// cout << "Captured" << endl;
 			process(ann);
-			// cout << "Processed" << endl;
 			display();
-			// cout << "Displayed" << endl;
+			
 		}
 	}else{
 		capture();

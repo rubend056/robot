@@ -2,6 +2,7 @@
 #include "img_process.h"
 #include "arg_helper.h"
 #include "browser.h"
+#include "input.h"
 #include <iostream>
 
 #include <boost/algorithm/string.hpp>
@@ -12,12 +13,6 @@ using namespace cv;
 void usage(const char* comm){
 	cout << "Usage: " << comm << "  <path_to_raw_data_folder>" << endl;
 }
-
-const int K_LEFT = 81, K_UP = 82, K_RIGHT = 83, K_DOWN = 84, K_ESC = 27;
-const int K_a = 97, K_s = 115, K_d = 100, K_w = 119;
-const int K_f = 102, K_g = 103, K_h = 104, K_t = 116;
-const int K_shift = 225, K_ctrl = 227;
-const int K_r = 114, K_e = 101, K_q=113, K_y=121, K_u=117;
 
 Mat image;
 Object o;

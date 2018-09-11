@@ -39,6 +39,9 @@ class Object{
 	private:
 };
 
+cv::VideoCapture startCamera(int index = 0);
+bool handleCameraInput(cv::VideoCapture &cap, int key);
+
 bool generalFolder(string name);
 
 void save_DB_image(std::string folder, int count, Object &o, cv::Mat &mat);
