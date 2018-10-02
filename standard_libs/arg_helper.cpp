@@ -7,7 +7,9 @@ char** arg_v;
 int c_arg = 1;
 
 string getArg(int shift){
-	return string(arg_v[c_arg + shift]);
+	if (checkArg(0, false))
+		return string(arg_v[c_arg + shift]);
+	else return string();
 }
 string useArg(){
 	auto s = getArg();
@@ -16,7 +18,7 @@ string useArg(){
 }
 
 bool checkArg(int count, bool usag){
-	if(arg_c - c_arg - 1 < count){if(usag)usage(arg_v[0]);/* std::cout << "Checked false on arg " << c_arg << std::endl;*/return false;} // Check if we at least have 1 command
+	if(arg_c - c_arg - 1 < count){if(usag)usage(arg_v[0]);return false;} // Check if we at least have 1 command
 	return true;
 }
 void setArgs(int argc, char** argv){

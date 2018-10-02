@@ -137,7 +137,7 @@ void set_and_print(cv::VideoCapture &cap, int propID, std::string propString, do
 	cout << "Camera " << propString << ": " << cap.get(propID) << endl;
 }
 
-double hue = 0.5, sat = 0.25, cont = 0.5;
+double hue = 0.5, sat = 0.5, cont = 0.5;
 cv::VideoCapture startCamera(int index){
 	auto cap = cv::VideoCapture(index);
 	set_and_print(cap, cv::CAP_PROP_FPS, "FPS", 30);

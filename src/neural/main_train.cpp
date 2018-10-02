@@ -243,7 +243,7 @@ int FANN_API callback(struct fann *ann, struct fann_train_data *train,
 		fann_save(ann, output_path.c_str());
 	}
 	
-	Mat tmat(Size(300, 200), CV_8UC1, Scalar(0,0,0));
+	Mat tmat(Size(300, 200), CV_8UC1, Scalar(0));
 	cv::imshow("Train", ip::showTraining (tmat, mse));
 	waitKey(1);
 	
