@@ -16,6 +16,7 @@ unsigned int neurons_between_reports = 1;
 // }
 
 using namespace nn;
+using namespace cv;
 
 class TrainData{
 	public:
