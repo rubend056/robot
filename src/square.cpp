@@ -47,18 +47,21 @@ static void findSquares( const Mat& image, vector<vector<Point>>& squares )
     squares.clear();
 
     Mat pyr, timg, gray0(image.size(), CV_8U), gray;
+    
 
     // down-scale and upscale the image to filter out the noise
     pyrDown(image, pyr, Size(image.cols/2, image.rows/2));
     pyrUp(pyr, timg, image.size());
     vector<vector<Point> > contours;
 
+    Mat channels[3];
+    split(timg, channels);
+
     // find squares in every color plane of the image
     for( int c = 0; c < 3; c++ )
     {
-        int ch[] = {c, 0};
-        mixChannels(&timg, 1, &gray0, 1, ch, 1);
-
+        gray0 = channels[c];
+        
         // try several threshold levels
         for( int l = 0; l < N; l++ )
         {

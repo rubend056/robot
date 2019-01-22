@@ -1,16 +1,16 @@
 #!/bin/bash
 
-currentPath=`pwd`
+# currentPath=`pwd`
 
-if [ ! -d "$currentPath/build" ]; then
+if [ ! -d "./build" ]; then
 	mkdir build
 fi
 
 cd build
-cmake -DCMAKE_BUILD_TYPE=Debug $currentPath
-make -j4
-printf "\n Done Building \n \n"
-./build/execute				
+	cmake -DCMAKE_BUILD_TYPE=Debug ..
+	make -j4
+	printf "\n Done Building \n \n"
+	./execute				
 # ./robot_train clear_cache
 # ./robot_train import /home/rubend/Documents/RobotTrainData
 # ./robot_train create_data box.data

@@ -22,7 +22,9 @@ void capture(){
 	if(cap.isOpened())cap >> rawMat;	
 	if(rawMat.empty())return;
     
-    cv::blur(rawMat, rawMat, cv::Size(6,6));
+	finalMat = rawMat.clone();
+
+    // cv::blur(rawMat, rawMat, cv::Size(6,6));
     cvtColor(rawMat, greyMat, COLOR_BGR2GRAY);
     // cv::fastNlMeansDenoising(greyMat, greyMat, float(3), float(3), 5);
 	cvtColor(rawMat, hsvMat, COLOR_BGR2HSV); //Extract the HSV color space from image
@@ -40,6 +42,12 @@ void capture(){
 vector<vector<Point>> squares;
 vector<vector<Point>> balls;
 
+void updateRaw(){
+	cvtColor(rawMat, greyMat, COLOR_BGR2GRAY);
+    // cv::fastNlMeansDenoising(greyMat, greyMat, float(3), float(3), 5);
+	cvtColor(rawMat, hsvMat, COLOR_BGR2HSV); //Extract the HSV color space from image
+}
+
 void process(){
 	if(rawMat.empty())return;
     
@@ -50,18 +58,24 @@ void process(){
 	// Mat element = getStructuringElement( MORPH_RECT,
     //                    Size( 2*erosion_size + 1, 2*erosion_size+1 ),
     //                    Point( erosion_size, erosion_size ) );
-	erode(rawMat, rawMat, NULL, Point(-1,-1), 2);
-	dilate(rawMat, rawMat, NULL, Point(-1,-1), 2);
 	
 	
 	
+	// ip::find_cubes(rawMat, squares);
+	Mat proMats[ip::colors.size()]; 
+	for(int i = 0; i < ip::colors.size(); i++)
+		proMats[i] = ip::processMat(hsvMat, ip::colors[i]);
+
 	for(int i = 0; i < ip::colors.size(); i++){
-		proMat = ip::processMat(rawMat, ip::colors[i]);
-		
-		ip::find_cubes(proMat, squares);
-        ip::draw_cubes(rawMat, squares, ip::colors_bgr[i]);
-		
-        ip::find_balls(proMat);
+		ip::find_cubes(proMats[i], squares);
+        ip::draw_cubes(finalMat, squares, ip::colors_bgr[i]);
+	}
+
+	cv::blur(rawMat, rawMat, cv::Size(6,6));
+	updateRaw();
+
+	for(int i = 0; i < ip::colors.size(); i++){
+        ip::find_balls(proMats[i]);
         ip::draw_balls(rawMat, ip::colors_bgr[i]);
 	}
 
@@ -126,8 +140,8 @@ void process(){
 }
 
 void display(){
-    if(!rawMat.empty())imshow("Raw", rawMat);
-	// if(!finalMat.empty())imshow("Final", finalMat);
+    // if(!rawMat.empty())imshow("Raw", rawMat);
+	if(!finalMat.empty())imshow("Final", finalMat);
  //    if(!proMat.empty())imshow("Filter", proMat);
 }
 
@@ -163,7 +177,7 @@ int main(int argc, char** argv)
 	// 	usage(argv[0]);
 	// 	return 1;
 	// }
-    cap = startCamera(0);
+    cap = startCamera();
     
     bool running = true;
     while(running){ //While ESC not pressed

@@ -33,7 +33,7 @@ namespace ip{
 	
 	// cv::Mat showTraining(cv::Mat mat, float mse);
 
-	void find_cubes(const cv::Mat& image, vector<vector<cv::Point>>& squares);
+	void find_cubes(const cv::Mat& hsv, vector<vector<cv::Point>>& squares);
 	void draw_cubes(cv::Mat& image, const vector<vector<cv::Point>>& squares, cv::Scalar col);
 
 	void find_balls(const cv::Mat& image);
