@@ -50,6 +50,7 @@ include_directories(
 	/libs/fann/include
     libs
     standard_libs
+    /usr/local/include/opencv4
 )
 
 

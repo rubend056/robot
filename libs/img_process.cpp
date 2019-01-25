@@ -153,7 +153,7 @@ vector<vector<Vec3f>> circle_v(smooth_num);
 	smooth_count++;if(smooth_count==smooth_num)smooth_count=0; // Up the counter
 	
 	auto circles = circle_v[smooth_count];
-	cv::HoughCircles(image, circles, CV_HOUGH_GRADIENT, 2, (double)image.rows/16, 100, 85, 6, image.rows/4);
+	cv::HoughCircles(image, circles, HOUGH_GRADIENT, 2, (double)image.rows/16, 100, 85, 6, image.rows/4);
 }
  void ip::draw_balls(Mat& image, Scalar col){
 	auto circles = circle_v[smooth_count];
