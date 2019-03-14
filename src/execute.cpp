@@ -19,7 +19,9 @@ void usage(const char* comm){
 
 string img_path = "";
 void capture(){
-	if(cap.isOpened())cap >> rawMat;	
+	Mat ourRaw;
+	if(cap.isOpened())cap >> ourRaw;
+	pyrDown(ourRaw, rawMat, Size(ourRaw.cols/2, ourRaw.rows/2));	
 	if(rawMat.empty())return;
     
 	finalMat = rawMat.clone();
@@ -73,7 +75,7 @@ void process(){
 
 	// proMat = proMats[0];
 
-	for(int i = 0; i < ip::colors.size(); i++){
+	for(int i = 0; i < 1; i++){
 		ip::find_cubes(proMats[i], squares);
         ip::draw_cubes(finalMat, squares, ip::colors_bgr[i]);
 	}
@@ -81,7 +83,7 @@ void process(){
 	cv::blur(rawMat, rawMat, cv::Size(10,10));
 	// updateRaw();
 
-	for(int i = 0; i < 2; i++){
+	for(int i = 0; i < 1; i++){
         ip::find_balls(proMats[i], (double)min_distance, (double)param1, (double)param2, minRadius, maxRadius);
         ip::draw_balls(finalMat, ip::colors_bgr[i]);
 	}
@@ -149,10 +151,10 @@ void process(){
 void display(){
     // if(!rawMat.empty())imshow("Raw", rawMat);
 	if(!finalMat.empty())imshow("Final", finalMat);
-    imshow("FilterBlue", proMats[0]);
-	imshow("Filtergreen", proMats[1]);
-	imshow("FilterRed", proMats[2]);
-	imshow("FilterYellow", proMats[3]);
+    // imshow("FilterBlue", proMats[0]);
+	// imshow("Filtergreen", proMats[1]);
+	// imshow("FilterRed", proMats[2]);
+	// imshow("FilterYellow", proMats[3]);
 }
 
 
@@ -189,7 +191,7 @@ int main(int argc, char** argv)
 	// 	usage(argv[0]);
 	// 	return 1;
 	// }
-    cap = startCamera(4);
+    cap = startCamera(0);
 
     namedWindow("HoughCircles");
 	createTrackbar("Min Distance", "HoughCircles", &min_distance, 100);

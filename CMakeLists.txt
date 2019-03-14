@@ -51,7 +51,7 @@ include_directories(
     
     libs
     standard_libs
-    /usr/include/opencv4
+    /usr/local/include/opencv4
 
 )
 
@@ -75,7 +75,7 @@ set(LIBS
 	
 	robot
 	common
-    /usr/local/lib/libfann.so.2
+    # /usr/local/lib/libfann.so.2
     
     ${OpenCV_LIBS}
 	${Boost_LIBRARIES}
