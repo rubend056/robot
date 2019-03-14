@@ -19,15 +19,7 @@ void usage(const char* comm){
 
 string img_path = "";
 void capture(){
-	if(cap.isOpened())cap >> rawMat;	
-	if(rawMat.empty())return;
-    
-	finalMat = rawMat.clone();
-
-    // cv::blur(rawMat, rawMat, cv::Size(6,6));
-    cvtColor(rawMat, greyMat, COLOR_BGR2GRAY);
-    // cv::fastNlMeansDenoising(greyMat, greyMat, float(3), float(3), 5);
-	cvtColor(rawMat, hsvMat, COLOR_BGR2HSV); //Extract the HSV color space from image
+	
 }
 
 // double colors[][3] = 
@@ -47,44 +39,9 @@ vector<vector<Point>> balls;
 //     // cv::fastNlMeansDenoising(greyMat, greyMat, float(3), float(3), 5);
 // 	cvtColor(rawMat, hsvMat, COLOR_BGR2HSV); //Extract the HSV color space from image
 // }
-cv::Mat proMats[4];
 
-int min_distance=45, param1=300, param2=40;
-int minRadius=6, maxRadius=70;
-int min_sat=70, min_val=115;
 void process(){
-	if(rawMat.empty())return;
-    
-	Mat scaled = rawMat;
-	// pyrDown(rawMat, scaled, Size(rawMat.cols/2, rawMat.rows/2));
-    // pyrUp(scaled, scaled, rawMat.size());
-	// int erosion_size = 2;
-	// Mat element = getStructuringElement( MORPH_RECT,
-    //                    Size( 2*erosion_size + 1, 2*erosion_size+1 ),
-    //                    Point( erosion_size, erosion_size ) );
 	
-	
-	
-	// ip::find_cubes(rawMat, squares);
-	
-	 
-	for(int i = 0; i < ip::colors.size(); i++)
-		proMats[i] = ip::processMat(hsvMat, ip::colors[i], min_sat, min_val);
-
-	// proMat = proMats[0];
-
-	for(int i = 0; i < ip::colors.size(); i++){
-		ip::find_cubes(proMats[i], squares);
-        ip::draw_cubes(finalMat, squares, ip::colors_bgr[i]);
-	}
-
-	cv::blur(rawMat, rawMat, cv::Size(10,10));
-	// updateRaw();
-
-	for(int i = 0; i < 2; i++){
-        ip::find_balls(proMats[i], (double)min_distance, (double)param1, (double)param2, minRadius, maxRadius);
-        ip::draw_balls(finalMat, ip::colors_bgr[i]);
-	}
 
 
 	// Mat tmat = Mat::zeros(rawMat.size(), CV_8UC3);// Create the final mat
@@ -149,13 +106,8 @@ void process(){
 void display(){
     // if(!rawMat.empty())imshow("Raw", rawMat);
 	if(!finalMat.empty())imshow("Final", finalMat);
-    imshow("FilterBlue", proMats[0]);
-	imshow("Filtergreen", proMats[1]);
-	imshow("FilterRed", proMats[2]);
-	imshow("FilterYellow", proMats[3]);
+    if(!proMat.empty())imshow("Filter", proMat);
 }
-
-
 
 int main(int argc, char** argv)
 {
@@ -190,21 +142,10 @@ int main(int argc, char** argv)
 	// 	return 1;
 	// }
     cap = startCamera(4);
-
-    namedWindow("HoughCircles");
-	createTrackbar("Min Distance", "HoughCircles", &min_distance, 100);
-	createTrackbar("Param 1", "HoughCircles", &param1, 450);
-	createTrackbar("Param 2", "HoughCircles", &param2, 450);
-	createTrackbar("Min Radius", "HoughCircles", &minRadius, 400);
-	createTrackbar("Max Radius", "HoughCircles", &maxRadius, 400);
-
-	// namedWindow("HoughCircles");
-	createTrackbar("Min Saturation", "HoughCircles", &min_sat, 255);
-	createTrackbar("Min Value", "HoughCircles", &min_val, 255);
-	
+    
     bool running = true;
     while(running){ //While ESC not pressed
-        int key = waitKey(2);
+        int key = waitKey(1);
         switch(key){
             case K_ESC:
                 running = false;
@@ -213,9 +154,55 @@ int main(int argc, char** argv)
 				if (key == -1)break;
                 if (!handleCameraInput(cap, key))cout << "Unsuported: " << key << endl;
         }
-        capture();
-        process();
-        display();
+        if(cap.isOpened())cap >> rawMat;
+        if(rawMat.empty())return 1;
+
+        finalMat = rawMat.clone();
+
+        // cv::blur(rawMat, rawMat, cv::Size(6,6));
+        cvtColor(rawMat, greyMat, COLOR_BGR2GRAY);
+        // cv::fastNlMeansDenoising(greyMat, greyMat, float(3), float(3), 5);
+        cvtColor(rawMat, hsvMat, COLOR_BGR2HSV); //Extract the HSV color space from image
+
+        // if(rawMat.empty())return;
+    
+        Mat scaled = rawMat;
+        // pyrDown(rawMat, scaled, Size(rawMat.cols/2, rawMat.rows/2));
+        // pyrUp(scaled, scaled, rawMat.size());
+        // int erosion_size = 2;
+        // Mat element = getStructuringElement( MORPH_RECT,
+        //                    Size( 2*erosion_size + 1, 2*erosion_size+1 ),
+        //                    Point( erosion_size, erosion_size ) );
+        
+        
+        
+        // ip::find_cubes(rawMat, squares);
+        
+        // Mat proMats[ip::colors.size()]; 
+        // for(int i = 0; i < ip::colors.size(); i++)
+        //     proMats[i] = ip::processMat(hsvMat, ip::colors[i]);
+        proMat = ip::processMat(hsvMat, ip::colors[0], 40, 50);
+        // proMat = proMats[0];
+        ip::find_cubes(proMat, squares);
+        ip::draw_cubes(finalMat, squares, ip::colors_bgr[0]);
+
+        // for(int i = 0; i < ip::colors.size(); i++){
+        //     ip::find_cubes(proMats[i], squares);
+        //     ip::draw_cubes(finalMat, squares, ip::colors_bgr[i]);
+        // }
+
+        cv::blur(rawMat, rawMat, cv::Size(6,6));
+        // updateRaw();
+        // ip::find_balls(proMat);
+        // ip::draw_balls(finalMat, ip::colors_bgr[0]);
+
+        // for(int i = 0; i < ip::colors.size(); i++){
+        //     ip::find_balls(proMats[i]);
+        //     ip::draw_balls(rawMat, ip::colors_bgr[i]);
+        // }     
+
+        if(!finalMat.empty())imshow("Final", finalMat);
+        if(!proMat.empty())imshow("Filter", proMat);
     }
 	
 	if(cap.isOpened())cap.release();

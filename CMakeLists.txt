@@ -47,16 +47,18 @@ include_directories(
     ${PROJECT_BINARY_DIR}
     ${PROJECT_SOURCE_DIR}
 
-	/libs/fann/include
+    /libs/fann/include
+    
     libs
     standard_libs
-    /usr/local/include/opencv4
+    /usr/include/opencv4
+
 )
 
 
-link_directories(
-    libs/fann/lib
-)
+# link_directories(
+#     libs/fann/lib
+# )
 
 # add_subdirectory(ownlibs)
 # add_subdirectory(scripts)
@@ -73,12 +75,13 @@ set(LIBS
 	
 	robot
 	common
+    /usr/local/lib/libfann.so.2
     
     ${OpenCV_LIBS}
 	${Boost_LIBRARIES}
 	
-	"libfann.so"
-	"libfloatfann.so"
+	# "libfann.so"
+	# "libfloatfann.so"
 )
 
 file( GLOB APP_SOURCES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" )

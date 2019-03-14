@@ -8,8 +8,11 @@ using namespace std;
 const int lowerS = 50, upperS = 255;
 const int lowerV = 40, upperV = 255;
 
-
 Mat ip::extractColor (Mat hsvMat, Color col){
+    return ip::extractColor(hsvMat, col, lowerS, lowerV);
+}
+
+Mat ip::extractColor (Mat hsvMat, Color col, int minV, int minS){
 	Mat mask;
 	if (hsvMat.empty()){cout << "HSV is empty, can't go on" << endl; return mask;}
 	
@@ -27,10 +30,10 @@ Mat ip::extractColor (Mat hsvMat, Color col){
 			ulrange = lrange;
 		}
 		
-		Scalar llower (llrange,lowerS,lowerV);
+		Scalar llower (llrange,minS,minV);
 		Scalar lupper (lurange,upperS,upperV);
 		
-		Scalar ulower (ulrange,lowerS,lowerV);
+		Scalar ulower (ulrange,minS,minV);
 		Scalar uupper (uurange,upperS,upperV);
 		
 		Mat lmask; inRange(hsvMat, llower, lupper, lmask);
@@ -38,7 +41,7 @@ Mat ip::extractColor (Mat hsvMat, Color col){
 		
 		mask = lmask | umask;
 	}else{
-		Scalar lower (hue - range,lowerS,lowerV);
+		Scalar lower (hue - range,minS,minV);
 		Scalar upper (hue + range,upperS,upperV);
 		
 		inRange(hsvMat, lower, upper, mask); // Extract the color
@@ -145,28 +148,55 @@ int thresh = 50, N = 11;
 }
 
 
-const int smooth_num = 5;
+const int smooth_num = 3;
 int smooth_count = 0;
 bool smooth_finished = false;
 vector<vector<Vec3f>> circle_v(smooth_num);
- void ip::find_balls(const Mat& image){
+ void ip::find_balls(const Mat& image, double min_dist, double param1, double param2, int minRadius, int maxRadius){
 	smooth_count++;if(smooth_count==smooth_num)smooth_count=0; // Up the counter
 	
-	auto circles = circle_v[smooth_count];
-	cv::HoughCircles(image, circles, HOUGH_GRADIENT, 2, (double)image.rows/16, 100, 85, 6, image.rows/4);
+	// auto circles = ;
+	cv::HoughCircles(image, circle_v[smooth_count], HOUGH_GRADIENT, 2, min_dist, param1, param2, minRadius, maxRadius);
+    // cout << circle_v[smooth_count].size() << endl;
 }
  void ip::draw_balls(Mat& image, Scalar col){
-	auto circles = circle_v[smooth_count];
-	for( size_t i = 0; i < circles.size(); i++ ) // Print out the circles
+	// auto circles = circle_v[smooth_count];
+	for( size_t i = 0; i < circle_v[smooth_count].size(); i++ ) // Print out the circles
 	{
-		Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-		int radius = cvRound(circles[i][2]);
+		Point center(cvRound(circle_v[smooth_count][i][0]), cvRound(circle_v[smooth_count][i][1]));
+		int radius = cvRound(circle_v[smooth_count][i][2]);
 		// circle center
 		circle(image, center, 3, col, -1, 8, 0 );
 		// circle outline
 		circle(image, center, radius, col, 3, 8, 0 );
 	}
+    circle_v[smooth_count].clear();
 }
+
+
+// vector<Vec3f> circle_v;
+//  void ip::find_balls(const Mat& image, double min_dist, double param1, double param2, int minRadius, int maxRadius){
+// 	// smooth_count++;if(smooth_count==smooth_num)smooth_count=0; // Up the counter
+	
+// 	// auto circles = ;
+// 	cv::HoughCircles(image, circle_v, HOUGH_GRADIENT, 2, min_dist, param1, param2, minRadius, maxRadius);
+//     // cout << circle_v[smooth_count].size() << endl;
+// }
+//  void ip::draw_balls(Mat& image, Scalar col){
+// 	// auto circles = circle_v[smooth_count];
+// 	for( size_t i = 0; i < circle_v.size(); i++ ) // Print out the circles
+// 	{
+// 		Point center(cvRound(circle_v[i][0]), cvRound(circle_v[i][1]));
+// 		int radius = cvRound(circle_v[i][2]);
+// 		// circle center
+// 		circle(image, center, 3, col, -1, 8, 0 );
+// 		// circle outline
+// 		circle(image, center, radius, col, 3, 8, 0 );
+// 	}
+//     circle_v.clear();
+// }
+
+
 // *************************************************************************
 
 // float hueFunction(float hue, Color color){
@@ -186,9 +216,9 @@ vector<vector<Vec3f>> circle_v(smooth_num);
 	
 // }
 
-Mat ip::processMat(Mat hsv, Color col){
+Mat ip::processMat(Mat hsv, Color col, int minV, int minS){
 	
-	Mat defmask = extractColor(hsv, col);
+	Mat defmask = extractColor(hsv, col, minV, minS);
 	
 	Mat valueMat;
 	extractChannel(hsv, valueMat, 2);
@@ -197,9 +227,9 @@ Mat ip::processMat(Mat hsv, Color col){
 	return outputMat;
 }
 
-Mat ip::getTrainMat(Mat mat){
-	return processMat(mat, colors[2]);
-}
+// Mat ip::getTrainMat(Mat mat){
+// 	return processMat(mat, colors[2]);
+// }
 
 
 //This function will return a mat to help users visualize the training, a simple graph.

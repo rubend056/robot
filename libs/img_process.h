@@ -25,9 +25,10 @@ namespace ip{
 	const vector<cv::Scalar> colors_bgr = {/*BLUE*/ cv::Scalar(255, 0, 0), /*GREEN*/ cv::Scalar(0, 255, 0), /*RED*/ cv::Scalar(0, 0, 255), /*YELLOW*/ cv::Scalar(0, 255, 255)};
 	
 	//Uses main.h function of getRGB and getHSV to get image and process it, dividing it into objects
-	cv::Mat processMat(cv::Mat mat, Color col);
+	cv::Mat processMat(cv::Mat mat, Color col, int minV, int minS);
 	
 	cv::Mat extractColor (cv::Mat hsvMat, Color col);
+	cv::Mat extractColor (cv::Mat hsvMat, Color col, int minV, int minS);
 	
 	cv::Mat getTrainMat(cv::Mat mat);
 	
@@ -36,7 +37,7 @@ namespace ip{
 	void find_cubes(const cv::Mat& hsv, vector<vector<cv::Point>>& squares);
 	void draw_cubes(cv::Mat& image, const vector<vector<cv::Point>>& squares, cv::Scalar col);
 
-	void find_balls(const cv::Mat& image);
+	void find_balls(const cv::Mat& image, double min_dist, double param1, double param2, int minRadius, int maxRadius);
 	void draw_balls(cv::Mat& image, cv::Scalar col);
 }
 
