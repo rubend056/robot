@@ -5,11 +5,14 @@
 #include "options.h"
 #include "comm.h"
 #include "arg_helper.h"
+#include <cstring>
 
 using namespace cv;
 
 cv::VideoCapture cap;
 cv::Mat rawMat, hsvMat, greyMat, proMat, finalMat;
+
+Comm myComm;
 
 void usage(const char* comm){
 	cout << "Usage: " << comm << "  <nn_name> <command>" << endl;
@@ -168,7 +171,7 @@ int main(int argc, char** argv)
 {
 	setArgs(argc, argv);
 	bool video = false;
-	Comm myComm;
+	
 
 
 	// auto nnPath = concatPath(fs::current_path(), nn_dir_name);
@@ -224,9 +227,11 @@ int main(int argc, char** argv)
         }
         capture();
         process();
+		uint32_t n[3];
+		memcpy(n, &ip::circle_v_o[0], 3);
+		myComm.sendToNav(n, 3);
+		
         display();
-		myComm.sendToNav('0');
-
     }
 	
 	if(cap.isOpened())cap.release();
