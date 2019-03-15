@@ -2,7 +2,7 @@
 #include "img_process.h"
 #include "logic_process.h"
 #include "input.h"
-
+#include "comm.h"
 #include "arg_helper.h"
 
 using namespace cv;
@@ -163,7 +163,9 @@ int main(int argc, char** argv)
 {
 	setArgs(argc, argv);
 	bool video = false;
-	
+	Comm myComm;
+
+
 	// auto nnPath = concatPath(fs::current_path(), nn_dir_name);
 	// if(!exists(nnPath)){fs::create_directory(nnPath);}
 	
@@ -218,6 +220,8 @@ int main(int argc, char** argv)
         capture();
         process();
         display();
+		myComm.sendToNav('0');
+
     }
 	
 	if(cap.isOpened())cap.release();
