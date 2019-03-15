@@ -2,6 +2,7 @@
 #include "img_process.h"
 #include "logic_process.h"
 #include "input.h"
+#include "options.h"
 
 #include "arg_helper.h"
 
@@ -15,6 +16,7 @@ void usage(const char* comm){
 	// cout << "	camera   <int camera_numb = 0>" << endl;
 	// cout << "	image    <path_to_image>" << endl;
 }
+
 
 
 string img_path = "";
@@ -49,7 +51,7 @@ vector<vector<Point>> balls;
 //     // cv::fastNlMeansDenoising(greyMat, greyMat, float(3), float(3), 5);
 // 	cvtColor(rawMat, hsvMat, COLOR_BGR2HSV); //Extract the HSV color space from image
 // }
-cv::Mat proMats[4];
+cv::Mat proMats[MAX_COLORS];
 
 int min_distance=45, param1=300, param2=40;
 int minRadius=6, maxRadius=70;
@@ -70,12 +72,12 @@ void process(){
 	// ip::find_cubes(rawMat, squares);
 	
 	 
-	for(int i = 0; i < ip::colors.size(); i++)
+	for(int i = 0; i < MAX_COLORS; i++)
 		proMats[i] = ip::processMat(hsvMat, ip::colors[i], min_sat, min_val);
 
 	// proMat = proMats[0];
 
-	for(int i = 0; i < 1; i++){
+	for(int i = 0; i < MAX_COLORS; i++){
 		ip::find_cubes(proMats[i], squares);
         ip::draw_cubes(finalMat, squares, ip::colors_bgr[i]);
 	}
@@ -83,7 +85,7 @@ void process(){
 	cv::blur(rawMat, rawMat, cv::Size(10,10));
 	// updateRaw();
 
-	for(int i = 0; i < 1; i++){
+	for(int i = 0; i < MAX_COLORS; i++){
         ip::find_balls(proMats[i], (double)min_distance, (double)param1, (double)param2, minRadius, maxRadius);
         ip::draw_balls(finalMat, ip::colors_bgr[i]);
 	}
@@ -148,11 +150,14 @@ void process(){
 	// cout << endl;
 }
 
+
+const char* window_names[] = {"FilterBlue", "FilterGreen", "FilterRed", "FilterYellow"};
 void display(){
     // if(!rawMat.empty())imshow("Raw", rawMat);
 	if(!finalMat.empty())imshow("Final", finalMat);
+	for(int i=0;i<MAX_COLORS;i++)imshow(window_names[i], proMats[i]);
     // imshow("FilterBlue", proMats[0]);
-	// imshow("Filtergreen", proMats[1]);
+	// imshow("FilterGreen", proMats[1]);
 	// imshow("FilterRed", proMats[2]);
 	// imshow("FilterYellow", proMats[3]);
 }
@@ -191,7 +196,7 @@ int main(int argc, char** argv)
 	// 	usage(argv[0]);
 	// 	return 1;
 	// }
-    cap = startCamera(0);
+    cap = startCamera(CAMERA_NUM);
 
     namedWindow("HoughCircles");
 	createTrackbar("Min Distance", "HoughCircles", &min_distance, 100);
@@ -199,10 +204,10 @@ int main(int argc, char** argv)
 	createTrackbar("Param 2", "HoughCircles", &param2, 450);
 	createTrackbar("Min Radius", "HoughCircles", &minRadius, 400);
 	createTrackbar("Max Radius", "HoughCircles", &maxRadius, 400);
-
-	// namedWindow("HoughCircles");
 	createTrackbar("Min Saturation", "HoughCircles", &min_sat, 255);
 	createTrackbar("Min Value", "HoughCircles", &min_val, 255);
+
+	for(int i=0;i<4;i++)namedWindow(window_names[i]);
 	
     bool running = true;
     while(running){ //While ESC not pressed
