@@ -33,7 +33,7 @@ namespace ip{
 	
 	cv::Mat getTrainMat(cv::Mat mat);
 	
-	extern cv::Vec3f circle_v_o;
+	extern cv::Vec3f* circle_v_o;
 	// cv::Mat showTraining(cv::Mat mat, float mse);
 
 	void find_cubes(const cv::Mat& hsv, vector<vector<cv::Point>>& squares);

@@ -150,7 +150,7 @@ int thresh = 50, N = 11;
 const int smooth_num = 3;
 int smooth_count = 0;
 bool smooth_finished = false;
-Vec3f ip::circle_v_o;
+Vec3f* ip::circle_v_o;
 vector<vector<Vec3f>> circle_v(smooth_num);
  void ip::find_balls(const Mat& image, double min_dist, double param1, double param2, int minRadius, int maxRadius){
 	smooth_count++;if(smooth_count==smooth_num)smooth_count=0; // Up the counter
@@ -158,7 +158,8 @@ vector<vector<Vec3f>> circle_v(smooth_num);
 	// auto circles = ;
 	cv::HoughCircles(image, circle_v[smooth_count], HOUGH_GRADIENT, 2, min_dist, param1, param2, minRadius, maxRadius);
     
-    circle_v_o = circle_v[smooth_count][0];
+    
+    circle_v_o = &circle_v[smooth_count][0];
 }
  void ip::draw_balls(Mat& image, Scalar col){
 	// auto circles = circle_v[smooth_count];

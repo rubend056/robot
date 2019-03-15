@@ -228,7 +228,8 @@ int main(int argc, char** argv)
         capture();
         process();
 		uint32_t n[3];
-		memcpy(n, &ip::circle_v_o[0], 3);
+		memcpy(n, &(*ip::circle_v_o)[0], 3*sizeof(float));
+		if(ip::circle_v_o != NULL)cout << (float)((*ip::circle_v_o)[0])<< " "<< (float)((*ip::circle_v_o)[1]) << endl;
 		myComm.sendToNav(n, 3);
 		
         display();

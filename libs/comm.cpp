@@ -13,8 +13,18 @@ Comm::Comm()
 	serialNav = serialOpen("/dev/ttySAC0",115200);
 }
 
+void printBits(uint8_t* j){
+	for (int i=0;i<8;i++){
+		bool b = j[0] << i;
+		cout << b ? '1' : '0';
+	}
+}
 void sendToNavBytes(const void* p, int n, int s){
-	for (int i=0;i<n;i++)serialPutchar(s,((uint8_t*)p)[i]);
+	for (int i=0;i<n;i++){
+		unsigned char r = ((uint8_t*)p)[i];
+		cout << r;
+		serialPutchar(s,r);
+	}
 }
 
 void Comm::sendToNav(uint32_t* floats, int n){
@@ -25,6 +35,7 @@ void Comm::sendToNav(uint32_t* floats, int n){
 	sendToNavBytes(((uint16_t*)&num_bytes), 2, serialNav); // Sent checksum
 	sendToNavBytes("\ne",2, serialNav); // Send end of file thing
 	serialFlush(serialNav);
+	cout << endl;
 }
 void Comm::sendToNav(char command)
 {
