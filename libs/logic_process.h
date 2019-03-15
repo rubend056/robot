@@ -2,7 +2,7 @@
 #define LOGIC_PROCESS
 
 #include "main.h"
-#include "comands.h"
+#include "comm.h"
 
 namespace lp{
 	

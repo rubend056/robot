@@ -8,6 +8,7 @@ set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (DEBUG 0)
 
+
 # This will pass arguments from cmake to the code
 configure_file (
   "${PROJECT_SOURCE_DIR}/cmakeconfig.h.in"
@@ -37,11 +38,15 @@ foreach( file ${TEST_IMAGES} )
     )
 endforeach( file ${TEST_IMAGES} )
 
-
+find_library(wiringPi_LIB wiringPi)
 # find_package(OpenGL REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(Boost COMPONENTS filesystem REQUIRED) # I spent 5 hours straight figuring out that I had to add "COMPONENTS filesystem" for the thing to work... dude
 #find_package(Fann REQUIRED)
+
+add_definitions("-lwiringPi -lcrypt -lm -lrt")
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
 include_directories(
     ${PROJECT_BINARY_DIR}
@@ -53,6 +58,7 @@ include_directories(
     standard_libs
     /usr/local/include/opencv4
     /usr/include/opencv4
+    /home/odroid/wiringPi
 
 )
 
@@ -76,14 +82,19 @@ set(LIBS
 	
 	robot
 	common
-    # /usr/local/lib/libfann.so.2
-    
+    # /usr/local/lib/libfann.so.2   
+
     ${OpenCV_LIBS}
-	${Boost_LIBRARIES}
-	
+    ${Boost_LIBRARIES}
+    ${wiringPi_LIB}
+    pthread
+    crypt
+    m
+    rt
 	# "libfann.so"
 	# "libfloatfann.so"
 )
+
 
 file( GLOB APP_SOURCES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" )
 foreach( src_file ${APP_SOURCES} )
