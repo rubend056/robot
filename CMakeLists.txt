@@ -52,6 +52,7 @@ include_directories(
     libs
     standard_libs
     /usr/local/include/opencv4
+    /usr/include/opencv4
 
 )
 
