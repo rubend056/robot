@@ -15,10 +15,14 @@ namespace ip{
 		public:
 			int hue;	// From 0-360
 			int range;	// From 0-360
+			int minS = 50;
+			int minV = 40;
 			Color(int h, int r){
 				hue = h;
 				range = r;
 			}
+			Color(int h, int r, int _minS, int _minV):Color(h,r){minS = _minS; minV = _minV;}
+
 	};
 
 	//Define all the colors
@@ -26,10 +30,10 @@ namespace ip{
 	const vector<cv::Scalar> colors_bgr = {/*BLUE*/ cv::Scalar(255, 0, 0), /*GREEN*/ cv::Scalar(0, 255, 0), /*RED*/ cv::Scalar(0, 0, 255), /*YELLOW*/ cv::Scalar(0, 255, 255)};
 	
 	//Uses main.h function of getRGB and getHSV to get image and process it, dividing it into objects
-	cv::Mat processMat(cv::Mat mat, Color col, int minV, int minS);
+	cv::Mat processMat(cv::Mat mat, Color col);
 	
 	cv::Mat extractColor (cv::Mat hsvMat, Color col);
-	cv::Mat extractColor (cv::Mat hsvMat, Color col, int minV, int minS);
+	// cv::Mat extractColor (cv::Mat hsvMat, Color col, int minV, int minS);
 	
 	cv::Mat getTrainMat(cv::Mat mat);
 	

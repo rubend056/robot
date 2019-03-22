@@ -8,11 +8,14 @@ using namespace std;
 const int lowerS = 50, upperS = 255;
 const int lowerV = 40, upperV = 255;
 
-Mat ip::extractColor (Mat hsvMat, Color col){
-    return ip::extractColor(hsvMat, col, lowerS, lowerV);
-}
+// Mat ip::extractColor (Mat hsvMat, Color col){
+//     return ip::extractColor(hsvMat, col, lowerS, lowerV);
+// }
 
-Mat ip::extractColor (Mat hsvMat, Color col, int minV, int minS){
+Mat ip::extractColor (Mat hsvMat, Color col){
+    int minV = col.minV;
+    int minS = col.minS;
+
 	Mat mask;
 	if (hsvMat.empty()){cout << "HSV is empty, can't go on" << endl; return mask;}
 	
@@ -218,9 +221,9 @@ vector<vector<Vec3f>> circle_v(smooth_num);
 	
 // }
 
-Mat ip::processMat(Mat hsv, Color col, int minV, int minS){
+Mat ip::processMat(Mat hsv, Color col){
 	
-	Mat defmask = extractColor(hsv, col, minV, minS);
+	Mat defmask = extractColor(hsv, col);
 	
 	Mat valueMat;
 	extractChannel(hsv, valueMat, 2);

@@ -6,8 +6,10 @@
 #include "comm.h"
 #include "arg_helper.h"
 #include <cstring>
+#include <vector>
 
 using namespace cv;
+
 
 cv::VideoCapture cap;
 cv::Mat rawMat, hsvMat, greyMat, proMat, finalMat;
@@ -76,7 +78,7 @@ void process(){
 	
 	 
 	for(int i = 0; i < MAX_COLORS; i++)
-		proMats[i] = ip::processMat(hsvMat, ip::colors[i], min_sat, min_val);
+		proMats[i] = ip::processMat(hsvMat, ip::colors[i]);
 
 	// proMat = proMats[0];
 
@@ -165,6 +167,7 @@ void display(){
 	// imshow("FilterYellow", proMats[3]);
 }
 
+std::vector<ip::Color> our_colors = {/*BLUE 178-260*/ ip::Color(219, 41), /*GREEN 90-150*/ ip::Color(120, 30), /*RED 0-29 331-360*/ ip::Color(0, 29), /*YELLOW 30-90*/ ip::Color(60, 30)};
 
 
 int main(int argc, char** argv)
@@ -212,7 +215,12 @@ int main(int argc, char** argv)
 	createTrackbar("Min Saturation", "HoughCircles", &min_sat, 255);
 	createTrackbar("Min Value", "HoughCircles", &min_val, 255);
 
-	for(int i=0;i<4;i++)namedWindow(window_names[i]);
+	for(int i=0;i<4;i++){
+		namedWindow(window_names[i]);
+		createTrackbar("Min Saturation", "HoughCircles", &our_colors[i].minS, 255);
+		createTrackbar("Min Value", "HoughCircles", &our_colors[i].minV, 255);
+	}
+	
 	
     bool running = true;
     while(running){ //While ESC not pressed

@@ -181,7 +181,7 @@ int main(int argc, char** argv)
         // Mat proMats[ip::colors.size()]; 
         // for(int i = 0; i < ip::colors.size(); i++)
         //     proMats[i] = ip::processMat(hsvMat, ip::colors[i]);
-        proMat = ip::processMat(hsvMat, ip::colors[0], 40, 50);
+        proMat = ip::processMat(hsvMat, ip::colors[0]);
         // proMat = proMats[0];
         ip::find_cubes(proMat, squares);
         ip::draw_cubes(finalMat, squares, ip::colors_bgr[0]);
