@@ -81,13 +81,14 @@ void process(){
 		proMats[i] = ip::processMat(hsvMat, ip::colors[i]);
 
 	// proMat = proMats[0];
+	cv::blur(rawMat, rawMat, cv::Size(10,10));
 
 	for(int i = 0; i < MAX_COLORS; i++){
 		ip::find_cubes(proMats[i], squares);
         ip::draw_cubes(finalMat, squares, ip::colors_bgr[i]);
 	}
 
-	cv::blur(rawMat, rawMat, cv::Size(10,10));
+	
 	// updateRaw();
 
 	for(int i = 0; i < MAX_COLORS; i++){
@@ -215,12 +216,12 @@ int main(int argc, char** argv)
 	createTrackbar("Min Saturation", "HoughCircles", &min_sat, 255);
 	createTrackbar("Min Value", "HoughCircles", &min_val, 255);
 
+
 	for(int i=0;i<4;i++){
 		namedWindow(window_names[i]);
 		createTrackbar("Min Saturation", "HoughCircles", &our_colors[i].minS, 255);
 		createTrackbar("Min Value", "HoughCircles", &our_colors[i].minV, 255);
 	}
-	
 	
     bool running = true;
     while(running){ //While ESC not pressed
