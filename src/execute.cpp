@@ -80,7 +80,6 @@ void process(){
 	for(int i = 0; i < MAX_COLORS; i++)
 		proMats[i] = ip::processMat(hsvMat, ip::colors[i]);
 
-	// proMat = proMats[0];
 	cv::blur(rawMat, rawMat, cv::Size(10,10));
 
 	for(int i = 0; i < MAX_COLORS; i++){
@@ -95,65 +94,6 @@ void process(){
         ip::find_balls(proMats[i], (double)min_distance, (double)param1, (double)param2, minRadius, maxRadius);
         ip::draw_balls(finalMat, ip::colors_bgr[i]);
 	}
-
-
-	// Mat tmat = Mat::zeros(rawMat.size(), CV_8UC3);// Create the final mat
-
-	// auto circles = circle_v[smooth_count];
-	// // Mat circle_mat;cv::inRange(proMat, Scalar(30), Scalar(255), circle_mat);
-	// cv::HoughCircles(proMat, circles, CV_HOUGH_GRADIENT, 2, (double)proMat.rows/16, 100, 85, 6, proMat.rows/4);
-	// cout << circles.size() << " ";
-	// for( size_t i = 0; i < circles.size(); i++ ) // Print out the circles
-	// {
-	// 	Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
-	// 	int radius = cvRound(circles[i][2]);
-	// 	// circle center
-	// 	circle( tmat, center, 3, Scalar(255,255,255), -1, 8, 0 );
-	// 	// circle outline
-	// 	circle( tmat, center, radius, Scalar(255,255,255), 3, 8, 0 );
-	// }
-
-	// objects.clear();
-	
-	
-    // cv::Mat cannyMat;
-    // vector<vector<Point>> contours;
-    // vector<Vec4i> hierarchy;
-
-    // cv::Canny(proMat, cannyMat, 80,120);
-	//// cv::dilate(cannyMat, cannyMat, Mat());
-    // cv::findContours(cannyMat, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
-    
-	// cout << contours.size() << " ";
-    
-    
-    // if (contours.size()>0)
-    //     cv::line(tmat, contours[0][0], contours[0][1], Scalar(255));
-
-    
-	// vector<vector<Point>> new_contours;
- //    for(auto c : contours){
-	// 	double length = 0;
- //        for(auto cn = c.begin() + 1; cn != c.end();cn ++){
- //            auto c0 = cn - 1;
-	// 		Point diff = *c0 - *cn;
-	// 		length += cv::sqrt(diff.x*diff.x + diff.y*diff.y);
- //        }
-	// 	if (length > 30)new_contours.push_back(c);
- //    }
-	// cout << new_contours.size() << " ";
-	
-	// int color = 0;
-	// for(auto c : new_contours){
- //        for(auto cn = c.begin() + 1; cn != c.end();cn ++){
- //            auto c0 = cn - 1;
- //            cv::line(tmat, *c0, *cn, cv::Scalar(colors[color][0], colors[color][1], colors[color][2]));
- //        }
-	// 	color ++;if(color==3)color = 0;
- //    }
-	// finalMat = tmat;
-
-	// cout << endl;
 }
 
 
