@@ -14,9 +14,8 @@ Comm::Comm()
 }
 
 void printBits(uint8_t* j){
-	for (int i=0;i<8;i++){
-		bool b = j[0] << i;
-		cout << b ? '1' : '0';
+	for (int i=7;i>=0;i--){
+		cout << ((j[0] >> i) & 1) ? '1' : '0';
 	}
 }
 void sendToNavBytes(const void* p, int n, int s){
@@ -92,11 +91,13 @@ uint8_t* CommObject::getBytes(vector<CommObject> objects, int* n){
 	int osize = (4*3+1); *n = objects.size() * osize;
 	uint8_t *d = (uint8_t*)malloc(*n); // We have our memory
 	for(int i=0;i<objects.size();i++){
+		// cout << i << " " << objects[i].x << " " << objects[i].y << " " << objects[i].s << " " << (objects[i].square ? '1' : '0') << " " << (int)objects[i].color << endl;
 		uint8_t* j = d + osize*i;
 		memcpy(j, &objects[i].x, 4);
 		memcpy(j+4, &objects[i].y, 4);
 		memcpy(j+8, &objects[i].s, 4);
-		uint8_t t = ((objects[i].square) << 7) & (objects[i].color);
+		uint8_t t = ((objects[i].square) << 7) | (objects[i].color);
+		// printBits(&t);
 		memcpy(j+12, &t, 1);
 	}
 	return d;
