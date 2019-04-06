@@ -22,7 +22,8 @@ void printBits(uint8_t* j){
 void sendToNavBytes(const void* p, int n, int s){
 	for (int i=0;i<n;i++){
 		unsigned char r = ((uint8_t*)p)[i];
-		cout << r;
+		auto t = (int)r;
+		cout << std::hex << t << std::dec;
 		serialPutchar(s,r);
 	}
 }
