@@ -93,8 +93,8 @@ uint8_t* CommObject::getBytes(vector<CommObject> objects, int* n){
 	for(int i=0;i<objects.size();i++){
 		uint8_t* j = d + osize*i;
 		memcpy(j, &objects[i].x, 4);
-		memcpy(j+4, &objects[i].x, 4);
-		memcpy(j+8, &objects[i].x, 4);
+		memcpy(j+4, &objects[i].y, 4);
+		memcpy(j+8, &objects[i].s, 4);
 		uint8_t t = ((objects[i].square) << 7) & (objects[i].color);
 		memcpy(j+12, &t, 1);
 	}
