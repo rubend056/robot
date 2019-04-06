@@ -1,5 +1,6 @@
 #include "img_process.h"
 #include "nnetwork.h"
+#include "options.h"
 
 using namespace ip;
 using namespace cv;
@@ -70,7 +71,6 @@ int thresh = 50, N = 11;
 
     Mat pyr, timg, gray0(image.size(), CV_8U), gray;
     
-
     // down-scale and upscale the image to filter out the noise
     pyrDown(image, pyr, Size(image.cols/2, image.rows/2));
     pyrUp(pyr, timg, image.size());
@@ -150,32 +150,100 @@ int thresh = 50, N = 11;
     }
 }
 
-const int smooth_num = 3;
-int smooth_count = 0;
-bool smooth_finished = false;
+template <typename T>
+class MovingAverage{
+public:
+    T *v;
+    int size;
+    MovingAverage(int _size):size(_size){v = static_cast<T*>(malloc(sizeof(T)*size));}
+    // ~MovingAverage(){memset(v,0,)}
+    void add(T d){
+        memcpy( v, v+1, sizeof(T)*(size-1) ); // Move all values -1 index in the array, deleting the last one
+        memcpy( v+size-1, &d, sizeof(T) ); // Copy new value to last element
+    }
+};
+
+
+// const int smooth_num = 2;
+// int smooth_count = 0;
+// bool smooth_finished = false;
 Vec3f* ip::circle_v_o;
-vector<vector<Vec3f>> circle_v(smooth_num);
- void ip::find_balls(const Mat& image, double min_dist, double param1, double param2, int minRadius, int maxRadius){
-	smooth_count++;if(smooth_count==smooth_num)smooth_count=0; // Up the counter
-	
-	// auto circles = ;
-	cv::HoughCircles(image, circle_v[smooth_count], HOUGH_GRADIENT, 2, min_dist, param1, param2, minRadius, maxRadius);
+int ip::color_num = 0;
+#define SMOOTH_NUM 2
+vector<Vec3f> ip::circle_s_oa[MAX_COLORS];
+vector<Vec3f> circle_va[MAX_COLORS][SMOOTH_NUM];
+
+void ip::find_balls(const Mat& image, double min_dist, double param1, double param2, int minRadius, int maxRadius){
+    auto circle_v = circle_va[color_num];
+    auto circle_s_o = circle_s_oa[color_num];
+	// smooth_count++;if(smooth_count==smooth_num)smooth_count=0; // Up the counter
+    for(int i=0;i<SMOOTH_NUM-1;i++)circle_v[i] = circle_v[i+1]; // Shifting the values
+
+    circle_v[SMOOTH_NUM-1].clear();
+	cv::HoughCircles(image, circle_v[SMOOTH_NUM-1], HOUGH_GRADIENT, 2, min_dist, param1, param2, minRadius, maxRadius);
+    if (circle_v[SMOOTH_NUM-1].size() == 1 && circle_v[SMOOTH_NUM-1][0][2] == 0)circle_v[SMOOTH_NUM-1].clear(); // Clearing circle if zero size
     
+    // Now we'll filter everything and output to circle_s_o
+    static float x_filter = 5, y_filter = 5, r_filter = 5;
+    circle_s_oa[color_num].clear();
+    auto ca_b = circle_v[SMOOTH_NUM-2];
+    auto ca_a = circle_v[SMOOTH_NUM-1];
+    for(int i=0;i<ca_b.size();i++){
+        auto c = ca_b[i];
+        for(int e=0;e<ca_a.size();e++){
+            auto d = ca_a[e];
+            if (
+                d[0] < c[0] + x_filter && d[0] > c[0] - x_filter &&
+                d[1] < c[1] + y_filter && d[1] > c[1] - y_filter &&
+                d[2] < c[2] + r_filter && d[2] > c[2] - r_filter
+            ){
+                Vec3f f;
+                for(int j=0;j<3;j++)f[j] = (c[j] + d[j]) * .5;
+                circle_s_oa[color_num].push_back(f);
+            }
+        }
+    }
     
-    circle_v_o = &circle_v[smooth_count][0];
+    if (circle_s_oa[color_num].size() > 0){
+        circle_v_o = &(circle_s_oa[color_num][0]);
+    }
+    else circle_v_o = NULL;
 }
- void ip::draw_balls(Mat& image, Scalar col){
-	// auto circles = circle_v[smooth_count];
-	for( size_t i = 0; i < circle_v[smooth_count].size(); i++ ) // Print out the circles
+
+
+void ip::draw_balls(Mat& image, Scalar col){
+	auto circles = circle_va[color_num][SMOOTH_NUM-1];
+	for( size_t i = 0; i < circles.size(); i++ ) // Print out the circles
 	{
-		Point center(cvRound(circle_v[smooth_count][i][0]), cvRound(circle_v[smooth_count][i][1]));
-		int radius = cvRound(circle_v[smooth_count][i][2]);
+		Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+		int radius = cvRound(circles[i][2]);
 		// circle center
-		circle(image, center, 3, col, -1, 8, 0 );
+		circle(image, center, 3, col, -1, 8, 0);
 		// circle outline
-		circle(image, center, radius, col, 3, 8, 0 );
+		circle(image, center, radius, col, 3, 8, 0);
 	}
-    circle_v[smooth_count].clear();
+    // circles.clear();
+}
+
+
+
+void ip::draw_all_balls(Mat& image){
+    for( int e = 0; e < MAX_COLORS; e++ ){
+        auto circles = circle_s_oa[e];
+        if (circles.size() == 0)continue;
+
+        auto v3 = circles[0]; cout << v3[0] << " " << v3[1] << " " << v3[2] << endl;
+
+        for( size_t i = 0; i < circles.size(); i++ ) // Print out the circles
+        {
+            Point center(cvRound(circles[i][0]), cvRound(circles[i][1]));
+            int radius = cvRound(circles[i][2]);
+            // circle center
+            circle(image, center, 3, colors_bgr[e], -1, 8, 0 );
+            // circle outline
+            circle(image, center, radius, colors_bgr[e], 3, 8, 0 );
+        }
+    }
 }
 
 
@@ -189,7 +257,7 @@ vector<vector<Vec3f>> circle_v(smooth_num);
 // }
 //  void ip::draw_balls(Mat& image, Scalar col){
 // 	// auto circles = circle_v[smooth_count];
-// 	for( size_t i = 0; i < circle_v.size(); i++ ) // Print out the circles
+// 	for( size_t i = 0; i < SMOOTH_NUM; i++ ) // Print out the circles
 // 	{
 // 		Point center(cvRound(circle_v[i][0]), cvRound(circle_v[i][1]));
 // 		int radius = cvRound(circle_v[i][2]);

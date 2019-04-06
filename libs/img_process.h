@@ -38,6 +38,8 @@ namespace ip{
 	cv::Mat getTrainMat(cv::Mat mat);
 	
 	extern cv::Vec3f* circle_v_o;
+	extern int color_num;
+	extern vector<cv::Vec3f> circle_s_oa[];
 	// cv::Mat showTraining(cv::Mat mat, float mse);
 
 	void find_cubes(const cv::Mat& hsv, vector<vector<cv::Point>>& squares);
@@ -45,6 +47,7 @@ namespace ip{
 
 	void find_balls(const cv::Mat& image, double min_dist, double param1, double param2, int minRadius, int maxRadius);
 	void draw_balls(cv::Mat& image, cv::Scalar col);
+	void draw_all_balls(cv::Mat& image);
 }
 
 #endif

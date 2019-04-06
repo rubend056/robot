@@ -78,6 +78,7 @@ string Object::getString(vector<Object> objects){
 	return r;
 }
 
+
 void writeObjects(cv::Mat src, vector<Object> objs){
 	for(auto it = objs.begin(); it != objs.end(); ++it)
 		cv::rectangle(src, cv::Rect2i(it->x, it->y, it->w, it->h), cv::Scalar(0), 2);

@@ -22,6 +22,7 @@ void usage(const char* comm){
 	// cout << "	image    <path_to_image>" << endl;
 }
 
+std::vector<ip::Color> our_colors = {/*BLUE 178-260*/ ip::Color(219, 41), /*GREEN 90-150*/ ip::Color(120, 30), /*RED 0-29 331-360*/ ip::Color(0, 29), /*YELLOW 30-90*/ ip::Color(60, 30)};
 
 
 string img_path = "";
@@ -34,7 +35,7 @@ void capture(){
 	finalMat = rawMat.clone();
 
     // cv::blur(rawMat, rawMat, cv::Size(6,6));
-    cvtColor(rawMat, greyMat, COLOR_BGR2GRAY);
+    // cvtColor(rawMat, greyMat, COLOR_BGR2GRAY);
     // cv::fastNlMeansDenoising(greyMat, greyMat, float(3), float(3), 5);
 	cvtColor(rawMat, hsvMat, COLOR_BGR2HSV); //Extract the HSV color space from image
 }
@@ -49,7 +50,7 @@ void capture(){
 // vector<Object> objects;
 
 vector<vector<Point>> squares;
-vector<vector<Point>> balls;
+vector<vector<Vec3f>> balls;
 
 // void updateRaw(){
 // 	cvtColor(rawMat, greyMat, COLOR_BGR2GRAY);
@@ -57,6 +58,9 @@ vector<vector<Point>> balls;
 // 	cvtColor(rawMat, hsvMat, COLOR_BGR2HSV); //Extract the HSV color space from image
 // }
 cv::Mat proMats[MAX_COLORS];
+cv::Mat proMats_c[MAX_COLORS];
+
+vector<CommObject> objects;
 
 int min_distance=45, param1=300, param2=40;
 int minRadius=6, maxRadius=70;
@@ -75,25 +79,59 @@ void process(){
 	
 	
 	// ip::find_cubes(rawMat, squares);
-	
-	 
-	for(int i = 0; i < MAX_COLORS; i++)
-		proMats[i] = ip::processMat(hsvMat, ip::colors[i]);
 
-	cv::blur(rawMat, rawMat, cv::Size(10,10));
+	cv::blur(rawMat, rawMat, cv::Size(2,2));
+	cvtColor(rawMat, hsvMat, COLOR_BGR2HSV);
+	 
+	for(int i = 0; i < MAX_COLORS; i++){
+		proMats[i] = ip::processMat(hsvMat, our_colors[i]);
+		proMats_c[i] = proMats[i].clone();
+	}
+	
+	objects.clear();
 
 	for(int i = 0; i < MAX_COLORS; i++){
 		ip::find_cubes(proMats[i], squares);
+		if (squares.size() > 0){
+			CommObject o;
+			// Setting averages
+			for(auto p : squares[0]){o.x += p.x; o.y += p.y;}
+			o.x /= squares[0].size();
+			o.y /= squares[0].size();
+			for(auto p : squares[0]){o.s += sqrt( pow(o.x - p.x,2) + pow(o.y - p.y,2) );}
+			o.s /= squares[0].size();
+			o.square = true;
+			o.color = i;
+			// Normalizing
+			o.x /= rawMat.cols;
+			o.y /= rawMat.rows;
+			o.s /= ((rawMat.cols + rawMat.rows) / 2);
+			// Pushing
+			objects.push_back(o);
+		}
         ip::draw_cubes(finalMat, squares, ip::colors_bgr[i]);
 	}
 
-	
-	// updateRaw();
-
 	for(int i = 0; i < MAX_COLORS; i++){
+		ip::color_num = i;
         ip::find_balls(proMats[i], (double)min_distance, (double)param1, (double)param2, minRadius, maxRadius);
-        ip::draw_balls(finalMat, ip::colors_bgr[i]);
+		if(ip::circle_s_oa[i].size() > 0){
+			for(auto c:ip::circle_s_oa[i]){
+				CommObject o;
+				// Setting and normalizing
+				o.x = c[0] / rawMat.cols;
+				o.y = c[1] / rawMat.rows;
+				o.s = c[2] / ((rawMat.cols + rawMat.rows) / 2);
+				o.square = false;
+				o.color = i;
+				// Pushing
+				objects.push_back(o);
+			}
+		}
+        ip::draw_balls(proMats_c[i], ip::colors_bgr[i]);
 	}
+	
+	ip::draw_all_balls(finalMat);
 }
 
 
@@ -101,14 +139,14 @@ const char* window_names[] = {"FilterBlue", "FilterGreen", "FilterRed", "FilterY
 void display(){
     // if(!rawMat.empty())imshow("Raw", rawMat);
 	if(!finalMat.empty())imshow("Final", finalMat);
-	for(int i=0;i<MAX_COLORS;i++)imshow(window_names[i], proMats[i]);
+	for(int i=0;i<MAX_COLORS;i++)imshow(window_names[i], proMats_c[i]);
     // imshow("FilterBlue", proMats[0]);
 	// imshow("FilterGreen", proMats[1]);
 	// imshow("FilterRed", proMats[2]);
 	// imshow("FilterYellow", proMats[3]);
 }
 
-std::vector<ip::Color> our_colors = {/*BLUE 178-260*/ ip::Color(219, 41), /*GREEN 90-150*/ ip::Color(120, 30), /*RED 0-29 331-360*/ ip::Color(0, 29), /*YELLOW 30-90*/ ip::Color(60, 30)};
+
 
 
 int main(int argc, char** argv)
@@ -153,14 +191,14 @@ int main(int argc, char** argv)
 	createTrackbar("Param 2", "HoughCircles", &param2, 450);
 	createTrackbar("Min Radius", "HoughCircles", &minRadius, 400);
 	createTrackbar("Max Radius", "HoughCircles", &maxRadius, 400);
-	createTrackbar("Min Saturation", "HoughCircles", &min_sat, 255);
-	createTrackbar("Min Value", "HoughCircles", &min_val, 255);
+	// createTrackbar("Min Saturation", "HoughCircles", &min_sat, 255);
+	// createTrackbar("Min Value", "HoughCircles", &min_val, 255);
 
 
-	for(int i=0;i<4;i++){
+	for(int i=0;i<MAX_COLORS;i++){
 		namedWindow(window_names[i]);
-		createTrackbar("Min Saturation", "HoughCircles", &our_colors[i].minS, 255);
-		createTrackbar("Min Value", "HoughCircles", &our_colors[i].minV, 255);
+		createTrackbar("Min Saturation", window_names[i], &our_colors[i].minS, 255);
+		createTrackbar("Min Value", window_names[i], &our_colors[i].minV, 255);
 	}
 	
     bool running = true;
@@ -177,23 +215,8 @@ int main(int argc, char** argv)
         capture();
         process();
 		
-		
-		
-		if(ip::circle_v_o != NULL){
-			// cout << (float)((*ip::circle_v_o)[0])<< " "<< (float)((*ip::circle_v_o)[1]) << endl;
-
-			float n[3];
-			memcpy(n, &(*ip::circle_v_o)[0], 3*sizeof(float)); // Copying to n
-			n[0] = n[0] / rawMat.cols;
-			n[1] = n[1] / rawMat.rows;
-			n[2] = n[2] / 40;
-
-			uint32_t j[3];
-			for(int i=0;i<3;i++)j[i]=*((uint32_t*)&n[i]); // Converting to uint32_t
-			cout << n[0] << endl;
-			myComm.sendToNav(j, 3);
-		}
-		
+		int n;
+		myComm.sendToNav(CommObject::getBytes(objects, &n), n);
 
         display();
     }

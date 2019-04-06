@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <cstring>
 
 #include <boost/filesystem.hpp>
 #include <boost/format.hpp>
