@@ -2,6 +2,7 @@
 #define COMM_H
 
 #include "misc.h"
+#include "byte_helper.h"
 #include <vector>
 #include <stdint.h>
 
