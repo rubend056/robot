@@ -78,10 +78,11 @@ add_subdirectory(libs)
 add_subdirectory(standard_libs)
 
 set(LIBS
-	#${OPENGL_LIBRARY}
-	
-	robot
-	common
+    #${OPENGL_LIBRARY}
+    
+    robot
+    common
+    
     # /usr/local/lib/libfann.so.2   
 
     ${OpenCV_LIBS}
@@ -94,6 +95,7 @@ set(LIBS
 	# "libfann.so"
 	# "libfloatfann.so"
 )
+
 
 
 file( GLOB APP_SOURCES RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" )
