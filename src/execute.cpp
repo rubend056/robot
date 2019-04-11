@@ -96,12 +96,12 @@ void process(){
 	for(int i = 0; i < MAX_COLORS; i++){
 		ip::find_cubes(proMats[i], squares);
 		if (squares.size() > 0){
-			CommPoly o;
+			CommPoly *o = new CommPoly();
 			// Setting averages
 			//   Finding center
-			for(auto p : squares[0]){o.x += p.x; o.y += p.y;}
-			o.x /= squares[0].size();
-			o.y /= squares[0].size();
+			for(auto p : squares[0]){o->x += p.x; o->y += p.y;}
+			o->x /= squares[0].size();
+			o->y /= squares[0].size();
 			//   Finding sizes
 			float mx=0, my=0, minx=rawMat.cols, miny=rawMat.rows;
 			for(auto p : squares[0]){
@@ -110,18 +110,18 @@ void process(){
 				if(p.x < minx)minx=p.x; 
 				if(p.y < miny)miny=p.y;} 
 			// for(auto p : squares[0]){o.s += sqrt( pow(o.x - p.x,2) + pow(o.y - p.y,2) );}
-			o.sx = mx - minx;
-			o.sy = my - miny;
+			o->sx = mx - minx;
+			o->sy = my - miny;
 			// o.s /= squares[0].size();
 			// o.square = true;
-			o.color = i;
+			o->color = i;
 			// Normalizing
-			o.x /= rawMat.cols;
-			o.y /= rawMat.rows;
-			o.sx /= rawMat.cols;
-			o.sy /= rawMat.rows;
+			o->x /= rawMat.cols;
+			o->y /= rawMat.rows;
+			o->sx /= rawMat.cols;
+			o->sy /= rawMat.rows;
 			// Pushing
-			objects.push_back(&o);
+			objects.push_back(o);
 		}
 		#if defined(DISPLAY)
         ip::draw_cubes(finalMat, squares, ip::colors_bgr[i]);
@@ -133,15 +133,15 @@ void process(){
         ip::find_balls(proMats[i], (double)min_distance, (double)param1, (double)param2, minRadius, maxRadius);
 		if(ip::circle_s_oa[i].size() > 0){
 			for(auto c:ip::circle_s_oa[i]){
-				CommCircle o;
+				CommCircle *o = new CommCircle();
 				// Setting and normalizing
-				o.x = c[0] / rawMat.cols;
-				o.y = c[1] / rawMat.rows;
-				o.r = c[2] / ((rawMat.cols + rawMat.rows) / 2);
+				o->x = c[0] / rawMat.cols;
+				o->y = c[1] / rawMat.rows;
+				o->r = c[2] / ((rawMat.cols + rawMat.rows) / 2);
 				// o.square = false;
-				o.color = i;
+				o->color = i;
 				// Pushing
-				objects.push_back(&o);
+				objects.push_back(o);
 			}
 		}
 		#if defined(DISPLAY) && defined(DISPLAY_COLORS)
@@ -239,7 +239,15 @@ int main(int argc, char** argv)
 
 		ByteConstructor bc;
 		CommObject::GetBytes(objects, bc);
+		
+		// if (bc.getSize()>0){
+		// 	int s;ByteReceiver br(bc.getBytes(), bc.getSize());
+		// 	CommObject ** ob = CommObject::GetObjects(br, s);
+		// 	for (int i=0;i<s;i++)ob[i]->print();
+		// }
+		
 		myComm.sendToNav(bc.getBytes(), bc.getSize());
+		for(auto o:objects)delete o; // Clearing up all objects
 
         display();
     }

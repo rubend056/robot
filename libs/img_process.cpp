@@ -234,7 +234,7 @@ void ip::draw_all_balls(Mat& image){
         auto circles = circle_s_oa[e];
         if (circles.size() == 0)continue;
 
-        auto v3 = circles[0]; cout << v3[0] << " " << v3[1] << " " << v3[2] << endl;
+        auto v3 = circles[0]; //cout << v3[0] << " " << v3[1] << " " << v3[2] << endl;
 
         for( size_t i = 0; i < circles.size(); i++ ) // Print out the circles
         {

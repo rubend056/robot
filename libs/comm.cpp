@@ -86,7 +86,7 @@ void CommObject::deserialize(ByteReceiver &br){
 	br.get(y);
 	br.get(color);
 }
-void CommObject::GetBytes(std::vector<CommObject*> objects, ByteConstructor& bc){
+void CommObject::GetBytes(std::vector<CommObject*> &objects, ByteConstructor& bc){
 	if (objects.size()==0)return;
 	bc.add<uint8_t>(objects.size());
 	for (auto o: objects)o->serialize(bc);
@@ -94,7 +94,9 @@ void CommObject::GetBytes(std::vector<CommObject*> objects, ByteConstructor& bc)
 CommObject** CommObject::GetObjects(ByteReceiver &br, int& s){
 	s = br.get<uint8_t>();
 	CommObject **objects = new CommObject*[s];
-	for(int i=0;i<s;s++)objects[i] = CommObject::Deserialize(br);
+	for(int i=0;i<s;i++){
+		objects[i] = CommObject::Deserialize(br);
+	}
 	return objects;
 }
 void CommObject::DeleteObjects(CommObject** objects, int s){for(int i=0;i<s;i++)delete objects[i]; delete[] objects;}
