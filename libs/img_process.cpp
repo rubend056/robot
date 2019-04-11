@@ -65,15 +65,16 @@ static double angle( Point pt1, Point pt2, Point pt0 )
     return (dx1*dx2 + dy1*dy2)/sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
 }
 
-int thresh = 50, N = 11;
+int thresh = 50, N = 1;
  void ip::find_cubes(const Mat& image, vector<vector<Point>>& squares){
 	squares.clear();
 
     Mat pyr, timg, gray0(image.size(), CV_8U), gray;
     
     // down-scale and upscale the image to filter out the noise
-    pyrDown(image, pyr, Size(image.cols/2, image.rows/2));
-    pyrUp(pyr, timg, image.size());
+    // pyrDown(image, pyr, Size(image.cols/2, image.rows/2));
+    // pyrUp(pyr, timg, image.size());
+    timg = image.clone();
     vector<vector<Point> > contours;
 
     // find squares in every color plane of the image
@@ -88,7 +89,7 @@ int thresh = 50, N = 11;
         {
             // apply Canny. Take the upper threshold from slider
             // and set the lower to 0 (which forces edges merging)
-            Canny(gray0, gray, 0, thresh, 5);
+            Canny(gray0, gray, 0, thresh, 7);
             // dilate canny output to remove potential
             // holes between edge segments
             dilate(gray, gray, Mat(), Point(-1,-1));
@@ -110,7 +111,7 @@ int thresh = 50, N = 11;
         {
             // approximate contour with accuracy proportional
             // to the contour perimeter
-            approxPolyDP(contours[i], approx, arcLength(contours[i], true)*0.02, true);
+            approxPolyDP(contours[i], approx, arcLength(contours[i], true)*0.04, true);
 
             // square contours should have 4 vertices after approximation
             // relatively large area (to filter out noisy contours)
@@ -118,8 +119,9 @@ int thresh = 50, N = 11;
             // Note: absolute value of an area is used because
             // area may be positive or negative - in accordance with the
             // contour orientation
-            if( approx.size() == 4 &&
-                fabs(contourArea(approx)) > 1000 &&
+            if( 
+                approx.size() == 4 &&
+                fabs(contourArea(approx)) > 200 &&
                 isContourConvex(approx) )
             {
                 double maxCosine = 0;
@@ -134,7 +136,7 @@ int thresh = 50, N = 11;
                 // if cosines of all angles are small
                 // (all angles are ~90 degree) then write quandrange
                 // vertices to resultant sequence
-                if( maxCosine < 0.3 )
+                if( maxCosine < 0.45 )
                     squares.push_back(approx);
             }
         }

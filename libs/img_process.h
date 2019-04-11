@@ -15,8 +15,8 @@ namespace ip{
 		public:
 			int hue;	// From 0-360
 			int range;	// From 0-360
-			int minS = 50;
-			int minV = 40;
+			int minS = 100;
+			int minV = 70;
 			Color(int h, int r){
 				hue = h;
 				range = r;

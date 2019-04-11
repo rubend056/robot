@@ -10,7 +10,8 @@
 
 using namespace cv;
 
-
+#define DISPLAY
+#define DISPLAY_COLORS
 cv::VideoCapture cap;
 cv::Mat rawMat, hsvMat, greyMat, proMat, finalMat;
 
@@ -22,15 +23,17 @@ void usage(const char* comm){
 	// cout << "	image    <path_to_image>" << endl;
 }
 
-std::vector<ip::Color> our_colors = {/*BLUE 178-260*/ ip::Color(219, 41), /*GREEN 90-150*/ ip::Color(120, 30), /*RED 0-29 331-360*/ ip::Color(0, 29), /*YELLOW 30-90*/ ip::Color(60, 30)};
+std::vector<ip::Color> our_colors = {/*BLUE 178-260*/ ip::Color(219, 41, 95, 38), /*GREEN 90-150*/ ip::Color(120, 30, 48, 52), /*RED 0-29 331-360*/ ip::Color(0, 29, 68, 79), /*YELLOW 30-90*/ ip::Color(60, 30, 78, 110)};
 
 
 string img_path = "";
 void capture(){
-	Mat ourRaw;
-	if(cap.isOpened())cap >> ourRaw;
-	pyrDown(ourRaw, rawMat, Size(ourRaw.cols/2, ourRaw.rows/2));	
+	// Mat ourRaw;
+	if(cap.isOpened())cap >> rawMat;
 	if(rawMat.empty())return;
+	resize(rawMat, rawMat, Size(rawMat.cols/4, rawMat.rows/4));	
+	// pyrDown(ourRaw, rawMat, Size(ourRaw.cols/2, ourRaw.rows/2));
+	
     
 	finalMat = rawMat.clone();
 
@@ -62,8 +65,8 @@ cv::Mat proMats_c[MAX_COLORS];
 
 vector<CommObject> objects;
 
-int min_distance=45, param1=300, param2=40;
-int minRadius=6, maxRadius=70;
+int min_distance=45, param1=300, param2=20;
+int minRadius=4, maxRadius=70;
 int min_sat=70, min_val=115;
 void process(){
 	if(rawMat.empty())return;
@@ -109,7 +112,9 @@ void process(){
 			// Pushing
 			objects.push_back(o);
 		}
+		#if defined(DISPLAY)
         ip::draw_cubes(finalMat, squares, ip::colors_bgr[i]);
+		#endif
 	}
 
 	for(int i = 0; i < MAX_COLORS; i++){
@@ -128,26 +133,31 @@ void process(){
 				objects.push_back(o);
 			}
 		}
+		#if defined(DISPLAY) && defined(DISPLAY_COLORS)
         ip::draw_balls(proMats_c[i], ip::colors_bgr[i]);
+		#endif
 	}
 	
+	#ifdef DISPLAY
 	ip::draw_all_balls(finalMat);
+	#endif
 }
 
 
 const char* window_names[] = {"FilterBlue", "FilterGreen", "FilterRed", "FilterYellow"};
 void display(){
     // if(!rawMat.empty())imshow("Raw", rawMat);
+	#if defined(DISPLAY)
 	if(!finalMat.empty())imshow("Final", finalMat);
+	#endif
+	#if defined(DISPLAY) && defined(DISPLAY_COLORS)
 	for(int i=0;i<MAX_COLORS;i++)imshow(window_names[i], proMats_c[i]);
+	#endif
     // imshow("FilterBlue", proMats[0]);
 	// imshow("FilterGreen", proMats[1]);
 	// imshow("FilterRed", proMats[2]);
 	// imshow("FilterYellow", proMats[3]);
 }
-
-
-
 
 int main(int argc, char** argv)
 {
@@ -184,22 +194,23 @@ int main(int argc, char** argv)
 	// 	return 1;
 	// }
     cap = startCamera(CAMERA_NUM);
-
+#ifdef DISPLAY
     namedWindow("HoughCircles");
 	createTrackbar("Min Distance", "HoughCircles", &min_distance, 100);
 	createTrackbar("Param 1", "HoughCircles", &param1, 450);
 	createTrackbar("Param 2", "HoughCircles", &param2, 450);
-	createTrackbar("Min Radius", "HoughCircles", &minRadius, 400);
-	createTrackbar("Max Radius", "HoughCircles", &maxRadius, 400);
+	createTrackbar("Min R", "HoughCircles", &minRadius, 400);
+	createTrackbar("Max R", "HoughCircles", &maxRadius, 400);
 	// createTrackbar("Min Saturation", "HoughCircles", &min_sat, 255);
 	// createTrackbar("Min Value", "HoughCircles", &min_val, 255);
-
-
+#endif
+#if defined(DISPLAY) && defined(DISPLAY_COLORS)
 	for(int i=0;i<MAX_COLORS;i++){
 		namedWindow(window_names[i]);
-		createTrackbar("Min Saturation", window_names[i], &our_colors[i].minS, 255);
-		createTrackbar("Min Value", window_names[i], &our_colors[i].minV, 255);
+		createTrackbar("Min S", window_names[i], &our_colors[i].minS, 255);
+		createTrackbar("Min V", window_names[i], &our_colors[i].minV, 255);
 	}
+#endif
 	
     bool running = true;
     while(running){ //While ESC not pressed
@@ -214,13 +225,10 @@ int main(int argc, char** argv)
         }
         capture();
         process();
-		
 		int n;
 		myComm.sendToNav(CommObject::getBytes(objects, &n), n);
-
         display();
     }
-	
 	if(cap.isOpened())cap.release();
 	destroyAllWindows();
 	
