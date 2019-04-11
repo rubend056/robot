@@ -60,7 +60,7 @@ vector<vector<Vec3f>> balls;
 cv::Mat proMats[MAX_COLORS];
 cv::Mat proMats_c[MAX_COLORS];
 
-vector<CommObject> objects;
+vector<CommObject*> objects;
 
 int min_distance=45, param1=300, param2=40;
 int minRadius=6, maxRadius=70;
@@ -93,21 +93,32 @@ void process(){
 	for(int i = 0; i < MAX_COLORS; i++){
 		ip::find_cubes(proMats[i], squares);
 		if (squares.size() > 0){
-			CommObject o;
+			CommPoly o;
 			// Setting averages
+			//   Finding center
 			for(auto p : squares[0]){o.x += p.x; o.y += p.y;}
 			o.x /= squares[0].size();
 			o.y /= squares[0].size();
-			for(auto p : squares[0]){o.s += sqrt( pow(o.x - p.x,2) + pow(o.y - p.y,2) );}
-			o.s /= squares[0].size();
-			o.square = true;
+			//   Finding sizes
+			float mx=0, my=0, minx=rawMat.cols, miny=rawMat.rows;
+			for(auto p : squares[0]){
+				if(p.x > mx)mx=p.x; 
+				if(p.y > my)my=p.y; 
+				if(p.x < minx)minx=p.x; 
+				if(p.y < miny)miny=p.y;} 
+			// for(auto p : squares[0]){o.s += sqrt( pow(o.x - p.x,2) + pow(o.y - p.y,2) );}
+			o.sx = mx - minx;
+			o.sy = my - miny;
+			// o.s /= squares[0].size();
+			// o.square = true;
 			o.color = i;
 			// Normalizing
 			o.x /= rawMat.cols;
 			o.y /= rawMat.rows;
-			o.s /= ((rawMat.cols + rawMat.rows) / 2);
+			o.sx /= rawMat.cols;
+			o.sy /= rawMat.rows;
 			// Pushing
-			objects.push_back(o);
+			objects.push_back(&o);
 		}
         ip::draw_cubes(finalMat, squares, ip::colors_bgr[i]);
 	}
@@ -117,15 +128,15 @@ void process(){
         ip::find_balls(proMats[i], (double)min_distance, (double)param1, (double)param2, minRadius, maxRadius);
 		if(ip::circle_s_oa[i].size() > 0){
 			for(auto c:ip::circle_s_oa[i]){
-				CommObject o;
+				CommCircle o;
 				// Setting and normalizing
 				o.x = c[0] / rawMat.cols;
 				o.y = c[1] / rawMat.rows;
-				o.s = c[2] / ((rawMat.cols + rawMat.rows) / 2);
-				o.square = false;
+				o.r = c[2] / ((rawMat.cols + rawMat.rows) / 2);
+				// o.square = false;
 				o.color = i;
 				// Pushing
-				objects.push_back(o);
+				objects.push_back(&o);
 			}
 		}
         ip::draw_balls(proMats_c[i], ip::colors_bgr[i]);
@@ -215,8 +226,9 @@ int main(int argc, char** argv)
         capture();
         process();
 		
-		int n;
-		myComm.sendToNav(CommObject::getBytes(objects, &n), n);
+		ByteConstructor bc;
+		CommObject::GetBytes(objects, bc);
+		myComm.sendToNav(bc.getBytes(), bc.getSize());
 
         display();
     }
