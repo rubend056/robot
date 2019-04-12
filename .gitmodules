@@ -3,4 +3,4 @@
 	url = git@github.com:rubend056/cpp_slibs.git
 [submodule "nav_serial"]
 	path = nav_serial
-	url = ./nav_serial
+	url = git@github.com:rubend056/robot_nav_common.git
