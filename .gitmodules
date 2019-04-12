@@ -1,3 +1,6 @@
 [submodule "standard_libs"]
 	path = standard_libs
 	url = git@github.com:rubend056/cpp_slibs.git
+[submodule "nav_serial"]
+	path = nav_serial
+	url = ./nav_serial
