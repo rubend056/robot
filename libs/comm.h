@@ -14,8 +14,6 @@ class Comm
         void sendToNav(char command);
         void receiveNav();
         int serialNav;
-
-
 };
 
 #endif

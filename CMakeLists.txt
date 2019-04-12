@@ -55,6 +55,7 @@ include_directories(
     /libs/fann/include
     
     libs
+    nav_serial
     standard_libs
     /usr/local/include/opencv4
     /usr/include/opencv4
@@ -75,13 +76,15 @@ include_directories(
 #)
 
 add_subdirectory(libs)
+add_subdirectory(nav_serial)
 add_subdirectory(standard_libs)
 
 set(LIBS
     #${OPENGL_LIBRARY}
     
-    robot
-    common
+    libs
+    nav_serial
+    standard_libs
     
     # /usr/local/lib/libfann.so.2   
 

@@ -1,4 +1,4 @@
-add_library(robot
+add_library(libs
     main_common.cpp
     logic_process.cpp
     img_process.cpp

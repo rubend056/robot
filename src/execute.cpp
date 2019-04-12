@@ -1,6 +1,7 @@
 #include "main.h"
 #include "img_process.h"
 #include "logic_process.h"
+#include "comm_class.h"
 #include "input.h"
 #include "options.h"
 #include "comm.h"
