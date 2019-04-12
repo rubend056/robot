@@ -188,6 +188,7 @@ void ip::find_balls(const Mat& image, double min_dist, double param1, double par
     if (circle_v[SMOOTH_NUM-1].size() == 1 && circle_v[SMOOTH_NUM-1][0][2] == 0)circle_v[SMOOTH_NUM-1].clear(); // Clearing circle if zero size
     
     // Now we'll filter everything and output to circle_s_o
+    #ifdef FILTER_CIRCLES
     static float x_filter = 5, y_filter = 5, r_filter = 5;
     circle_s_oa[color_num].clear();
     auto ca_b = circle_v[SMOOTH_NUM-2];
@@ -207,6 +208,9 @@ void ip::find_balls(const Mat& image, double min_dist, double param1, double par
             }
         }
     }
+    #else
+    circle_s_oa[color_num] = circle_v[SMOOTH_NUM-1];
+    #endif
     
     if (circle_s_oa[color_num].size() > 0){
         circle_v_o = &(circle_s_oa[color_num][0]);

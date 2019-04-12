@@ -40,7 +40,7 @@ void capture(){
 
     // cv::blur(rawMat, rawMat, cv::Size(6,6));
     // cvtColor(rawMat, greyMat, COLOR_BGR2GRAY);
-    // cv::fastNlMeansDenoising(greyMat, greyMat, float(3), float(3), 5);
+    cv::fastNlMeansDenoising(rawMat, rawMat, float(3), float(3), 5);
 	cvtColor(rawMat, hsvMat, COLOR_BGR2HSV); //Extract the HSV color space from image
 }
 
