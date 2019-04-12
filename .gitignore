@@ -1,6 +1,7 @@
 /opencv*
 /fann
 libs/options.h
+options.h
 
 build
 .vscode
