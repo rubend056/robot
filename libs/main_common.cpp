@@ -146,7 +146,7 @@ void get_and_print(cv::VideoCapture &cap, int propID, std::string propString, do
 
 
 
-double fps = 30, hue = 0.42, sat = 0.25, cont = 0.5, bright = 0.0, exposure = 0.0;
+double fps = 30, hue = 0.42, sat = 0.25, cont = 0.5, bright = 0.0, exposure = 0.0, wb=.5;
 cv::VideoCapture startCamera(int index){
 	auto cap = cv::VideoCapture(index);
 	
@@ -157,12 +157,14 @@ cv::VideoCapture startCamera(int index){
 
 	// set_and_print(cap, cv::CAP_PROP_AUTO_EXPOSURE, "AutoExpo", &ae);
 	get_and_print(cap, 21, "Exposure", &exposure);
+	get_and_print(cap, cv::CAP_PROP_WB_TEMPERATURE, "White Balance", &wb);
+	
 	// get_and_print(cap, cv::CAP_PROP_GAIN)
 	get_and_print(cap, cv::CAP_PROP_BRIGHTNESS, "Brightness", &bright);
 	get_and_print(cap, cv::CAP_PROP_SATURATION, "Saturation", &sat);
 	get_and_print(cap, cv::CAP_PROP_CONTRAST, "Contrast", &cont);
 	
-	// cout << "Camera " << cap.get(cv::CAP_PROP_GAMMA) << endl;
+	// cout << "Camera " << cap.get(cv::CAP_PROP_WB) << endl;
 	// cout << "Camera " << cap.get(cv::CAP_PROP_AUTO_EXPOSURE) << endl;
 	// cout << "Camera " << cap.get(cv::CAP_PROP_EXPOSURE) << endl;
 	// cout << "Camera " << cap.get(cv::CAP_PROP_EXPOSUREPROGRAM) << endl;
@@ -211,6 +213,16 @@ bool handleCameraInput(cv::VideoCapture &cap, int key){
 			bright += 0.01;
 			set_and_print(cap, cv::CAP_PROP_BRIGHTNESS, "Brightness", &bright);
 			break;
+		
+		case K_f:
+			wb -= 0.01;
+			set_and_print(cap, cv::CAP_PROP_WB_TEMPERATURE, "White Balance", &wb);
+			break;
+		case K_g:
+			wb += 0.01;
+			set_and_print(cap, cv::CAP_PROP_WB_TEMPERATURE, "White Balance", &wb);
+			break;
+		
 
 		default:
 			return false;

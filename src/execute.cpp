@@ -65,8 +65,8 @@ cv::Mat proMats_c[MAX_COLORS];
 
 vector<CommObject*> objects;
 
-int min_distance=45, param1=300, param2=20;
-int minRadius=4, maxRadius=70;
+int min_distance=53, param1=264, param2=23;
+int minRadius=4, maxRadius=16;
 int min_sat=70, min_val=115;
 void process(){
 	if(rawMat.empty())return;
