@@ -11,8 +11,7 @@
 
 using namespace cv;
 
-#define DISPLAY
-#define DISPLAY_COLORS
+
 cv::VideoCapture cap;
 cv::Mat rawMat, hsvMat, greyMat, proMat, finalMat;
 
