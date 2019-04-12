@@ -1,6 +1,8 @@
 #include "img_process.h"
-#include "nnetwork.h"
+// #include "nnetwork.h"
 #include "options.h"
+
+#include <string>
 
 using namespace ip;
 using namespace cv;

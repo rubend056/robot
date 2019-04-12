@@ -6,6 +6,8 @@
 #include <fann.h>
 #include <floatfann.h>
 
+#include "boost_misc.h"
+
 extern unsigned int max_epochs;
 extern float desired_error;
 extern unsigned int epochs_between_reports;

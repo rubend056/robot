@@ -3,6 +3,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <string>
+
 unsigned int max_epochs = 1000;
 float desired_error = 0.0001f;
 unsigned int epochs_between_reports = 50;

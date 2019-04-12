@@ -4,6 +4,7 @@
 #include <boost/format.hpp>
 #include <sstream>
 
+#include "boost_misc.h"
 #include "input.h"
 
 bool tCascade = false;
