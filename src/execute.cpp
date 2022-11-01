@@ -123,6 +123,9 @@ void process(){
 			// Pushing
 			objects.push_back(o);
 		}
+		for(int i=0;i<squares.size();i++){
+			cv::fillPoly(proMats[i], squares, cv::Scalar(0));
+		}
 		#if defined(DISPLAY)
         ip::draw_cubes(finalMat, squares, ip::colors_bgr[i]);
 		#endif
